@@ -8,6 +8,7 @@ output: html_document
 ```{r setup, include=FALSE}
 
 rm(list=ls()) # clean up
+library(here)
 library(knitr)
 library(plyr)
 library(car)
@@ -53,6 +54,7 @@ library(qiime2R)
 # Using rbiom package for calculating unifrac distances instead
 library(rbiom)
 
+
 opts_chunk$set(comment="  ",
                collapse=TRUE, 
                echo=FALSE,
@@ -86,32 +88,35 @@ veganCovEllipse <- function (cov, center = c(0, 0), scale = 1, npoints = 100)
 
 ```
 
+# Table S1
+
 ```{r turf species list, eval = FALSE}
-turf = read.csv("/Users/noamaltman-kurosaki/iCloud Drive (Archive) - 1/Documents/Grad school (general)/PhD General/Coral-algal contact experiment/Supplemental materials for initial submission coral reefs/Data and code/Turf cover and PAM data/Coral-algal contact experiment - turf species list wide.csv", stringsAsFactors = T)
-turf[is.na(turf)] = 0 # set empty cells to 0
-turf$Comb.trt = as.factor(paste(turf$Damselfish.trt, "-", turf$Month.trt)) # create new factor for aggregating
-turf_list = ddply(turf, "Comb.trt", numcolwise(sum)) # sum across cob trt to get number of samples containing species of algae
-turf_list[,2:44] = turf_list[,2:44]/12 # convert turf list to show proportion of samples it was present in per stratum
-turf_list = as.data.frame(t(turf_list)) # transpose and convert to dataframe
-colnames(turf_list) = turf_list[1,] # set colnames to be the first row of the data (factor)
-turf_list = turf_list[-1,] # remove first row (repetitive to column names due to t() fxn)
+turf <- read.csv(here::here("data", "turf_species_list_wide.csv"), stringsAsFactors = T)
+turf[is.na(turf)] <- 0 # set empty cells to 0
+turf$Comb.trt <- as.factor(paste(turf$Damselfish.trt, "-", turf$Month.trt)) # create new factor for aggregating
+turf_list <- ddply(turf, "Comb.trt", numcolwise(sum)) # sum across cob trt to get number of samples containing species of algae
+turf_list[,2:44] <- turf_list[,2:44]/12 # convert turf list to show proportion of samples it was present in per stratum
+turf_list <- as.data.frame(t(turf_list)) # transpose and convert to dataframe
+colnames(turf_list) <- turf_list[1,] # set colnames to be the first row of the data (factor)
+turf_list <- turf_list[-1,] # remove first row (repetitive to column names due to t() fxn)
 
-# write.csv(turf_list, "/Users/noamaltman-kurosaki/iCloud Drive (Archive) - 1/Documents/Grad school (general)/PhD General/Coral-algal contact experiment/Damselfish turf species list long v1.csv")
-
+# write turf_list to directory of your choice for creation of table S1 in ESM
 ```
 
-```{r turf richness, eval = FALSE}
-turf_species = turf[,unlist(lapply(turf, is.numeric))] # subset just turf species based on if the column is a numeric
+# Figure S1
 
-turf$Richness = rowSums(turf_species) # species richness for a sample found by summing across all species present in that sample
+```{r turf richness, eval = FALSE}
+turf_species <- turf[,unlist(lapply(turf, is.numeric))] # subset just turf species based on if the column is a numeric
+
+turf$Richness <- rowSums(turf_species) # species richness for a sample found by summing across all species present in that sample
 hist(turf$Richness)
-richnessglm = glmmTMB(Richness ~ Damselfish.trt*Month.trt, data = turf, family = compois) # conway maxwell poisson
+richnessglm <- glmmTMB(Richness ~ Damselfish.trt*Month.trt, data = turf, family = compois) # conway maxwell poisson for underdispersion
 
 plot(simulateResiduals(richnessglm)) # residuals look good
 summary(richnessglm)
 Anova(richnessglm) # No difference in richness based on damselfish (X2 = 1.1, P = 0.3), month (X2 = 0.25, P = 0.6), or their interaction (X2 = 0.70, P = 0.4)
-richness_means = ddply(turf, c("Damselfish.trt", "Month.trt"), numcolwise(mean))
-richness_se = ddply(turf, c("Damselfish.trt", "Month.trt"), numcolwise(se))
+richness_means <- ddply(turf, c("Damselfish.trt", "Month.trt"), numcolwise(mean))
+richness_se <- ddply(turf, c("Damselfish.trt", "Month.trt"), numcolwise(se))
 # SN-M: 11.3 ± 0.60 
 # SN-S: 10 ± 0.72
 # SP-M: 9.5 ± 0.45
@@ -144,82 +149,98 @@ ggplot()+
 
 ```
 
+# Table S2
+
 ```{r turf relative abundance}
-turf_cover = read.csv("/Users/noamaltman-kurosaki/iCloud Drive (Archive) - 1/Documents/Grad school (general)/PhD General/Coral-algal contact experiment/Supplemental materials for initial submission coral reefs/Data and code/Turf cover and PAM data/Coral-algal contact experiment - turf species cover.csv", stringsAsFactors = T)
-turf_cover[is.na(turf_cover)] = 0 # set empty cells to 0
-turf_cover = ddply(turf_cover, c("Damselfish.trt", "Month.trt", "Sample.ID"), numcolwise(mean) ) # average across 5 fields of view to get relative abundance per sample
+turf_cover <- read.csv(here::here("data", "turf_species_cover.csv"), stringsAsFactors = T)
+turf_cover[is.na(turf_cover)] <- 0 # set empty cells to 0
+turf_cover <- ddply(turf_cover, c("Damselfish.trt", "Month.trt", "Sample.ID"), numcolwise(mean) ) # average across 5 fields of view to get relative abundance per sample
 
-### FOR RELATIVE ABUNDANCE TABLE IN MS ###
-##  turf_cover_table = ddply(turf_cover, c("Damselfish.trt", "Month.trt"), numcolwise(mean) )
-##  turf_cover_table = t(turf_cover_table)
-## write.csv(turf_cover_table, "/Users/noamaltman-kurosaki/iCloud Drive (Archive) - 1/Documents/Grad school (general)/PhD General/Coral-algal contact experiment/urf cover table means.csv")
-##  
-##  turf_cover_table_se = ddply(turf_cover, c("Damselfish.trt", "Month.trt"), numcolwise(se) )
-##  turf_cover_table_se = t(turf_cover_table_se)
-##  write.csv(turf_cover_table_se, "/Users/noamaltman-kurosaki/iCloud Drive (Archive) - 1/Documents/Grad school (general)/PhD  General/Coral-algal contact experiment/urf cover table SE.csv")
 
-turf_m = data.matrix(turf_cover[,-c(1:4)]) # create matrix of just species
-turf_m = turf_m/100 # convert percentage data to proportional data
+turf_cover_table <- ddply(turf_cover, c("Damselfish.trt", "Month.trt"), numcolwise(mean) ) # get mean cover
+turf_cover_table <- t(turf_cover_table) # transpose into long table
 
-rownames(turf_m) = turf_cover$Sample.ID # set sample ID as row name
-turf_m_trans = asin(sqrt(turf_m)) # create matrix with arcsin sqrt transformed data
+turf_cover_table_se <- ddply(turf_cover, c("Damselfish.trt", "Month.trt"), numcolwise(se) ) # repeat with standard errors
+turf_cover_table_se <- t(turf_cover_table_se)
+
+# write both turf_cover_tables to csv and combine in word to create table S2
+```
+
+# Figure 1
+
+```{r turf permanova and ordination}
+turf_m <- data.matrix(turf_cover[,-c(1:4)]) # create matrix of just species
+turf_m <- turf_m/100 # convert percentage data to proportional data
+
+rownames(turf_m) <- turf_cover$Sample.ID # set sample ID as row name
+turf_m_trans <- asin(sqrt(turf_m)) # create matrix with arcsin sqrt transformed data
 
 # PERMANOVA
-adonis2(vegdist(turf_m_trans, method = "bray") ~ Damselfish.trt*Month.trt, data = turf_cover) 
+vegan::adonis2(vegdist(turf_m_trans, method = "bray") ~ Damselfish.trt*Month.trt, data = turf_cover) 
 # Significant difference in turf communities based on damselfish (F = 59.1, P < 0.001), month (F - 5.5, P = 0.005), and interaction (F = 3.5, P = 0.02)
 
+# assess if assumption of multivariate homogeneity of variance is violated
+vegan::permutest(vegan::betadisper(vegdist(turf_m_trans, method = "bray"), as.factor(paste(turf_cover$Damselfish.trt, "-", turf_cover$Month.trt)))) # P = 0.26 
 
-
-
-ord2 = metaMDS(turf_m_trans, dist	= "bray",	trymax	= 100,	k	= 2)
-ord2 # stress = 0.11
+# set.seed(1032)
+# ord2 <- metaMDS(turf_m_trans, dist	= "bray",	trymax	= 100,	k	= 2)
+# ord2 # stress = 0.11
 
 set.seed(1032)
-ord3 = metaMDS(turf_m_trans, dist	= "bray",	trymax	= 100,	k	= 3)
+ord3 <- metaMDS(turf_m_trans, dist	= "bray",	trymax	= 100,	k	= 3)
 ord3 # stress = 0.08
 
-ord4 = metaMDS(turf_m_trans, dist	= "bray",	trymax	= 100,	k	= 4)
-ord4 # stress  = 0.06
+#ord4 <- metaMDS(turf_m_trans, dist	= "bray",	trymax	= 100,	k	= 4)
+#ord4 # stress  = 0.06
+
+# 3 dimensional ordination cause notable reduction in stress while still being relatively low dimension
 
 
-
-vegan::permutest(vegan::betadisper(vegdist(turf_m_trans, method = "bray"), as.factor(paste(turf_cover$Damselfish.trt, "-", turf_cover$Month.trt)))) # P = 0.26
 ```
 
 
 ```{r turf plotting, fig.height=20, fig.width=20}
 
-cTurf.site.scores = as.data.frame(scores(ord3, "sites"))  #Using the scores function from vegan to extract the site scores and convert to a data.frame
-cTurf.site.scores$Sample = rownames(cTurf.site.scores)  # create a column of site names, from the rownames of data.scores
-cTurf.site.scores$Treatment = as.factor(paste(turf_cover$Damselfish.trt, "-", turf_cover$Month.trt))  #  add the treatment as a grouping vactor
-cTurf.site.scores$Damselfish = turf_cover$Damselfish.trt
-cTurf.site.scores$Month = turf_cover$Month.trt
+cTurf.site.scores <- as.data.frame(scores(ord3, "sites"))  #Using the scores function from vegan to extract the site scores and convert to a data.frame
+cTurf.site.scores$Sample <- rownames(cTurf.site.scores)  # create a column of site names, from the rownames of data.scores
+cTurf.site.scores$Treatment <- as.factor(paste(turf_cover$Damselfish.trt, "-", turf_cover$Month.trt))  #  add the treatment as a grouping vactor
+cTurf.site.scores$Damselfish <- turf_cover$Damselfish.trt
+cTurf.site.scores$Month <- turf_cover$Month.trt
 
 cTurf.species.scores <- as.data.frame(scores(ord3, "species"))  #Using the scores function from vegan to extract the species scores and convert to a data.frame
 cTurf.species.scores$species <- rownames(cTurf.species.scores)  # create a column of species, from the rownames of species.scores
 
 df_ell.cTurf.Treatment <- data.frame() #sets up a data frame before running the function.
+# extract ellipses
 for(g in levels(cTurf.site.scores$Treatment)){
   df_ell.cTurf.Treatment <- rbind(df_ell.cTurf.Treatment, cbind(as.data.frame(with(cTurf.site.scores[cTurf.site.scores$Treatment==g,],                                                 veganCovEllipse(cov.wt(cbind(NMDS1,NMDS2),wt=rep(1/length(NMDS1),
                                length(NMDS1)))$cov,center=c(mean(NMDS1),mean(NMDS2)))))
                                       ,Treatment=g))
 }
 # bootleg way to add in factors for treatments
-df_ell.cTurf.Treatment$Damselfish = as.factor( c(rep("Stegastes nigricans", 202), rep("Stegastes punctatus", 202)) )
-df_ell.cTurf.Treatment$Month = as.factor(c(rep("March", 101), rep("September", 101),
+df_ell.cTurf.Treatment$Damselfish <- as.factor( c(rep("Stegastes nigricans", 202), rep("Stegastes punctatus", 202)) )
+df_ell.cTurf.Treatment$Month <- as.factor(c(rep("March", 101), rep("September", 101),
                                                rep("March", 101), rep("September", 101)))
 
 # data for labelling the ellipse
-NMDS.mean=aggregate(cTurf.site.scores[,c("NMDS1", "NMDS2")], 
+NMDS.mean <- aggregate(cTurf.site.scores[,c("NMDS1", "NMDS2")], 
                     list(group = cTurf.site.scores$Treatment), mean)
 
+# plot
 ggplot() + 
-
-  geom_point(data=cTurf.site.scores,aes(x=NMDS1,y=NMDS2, colour=Damselfish, shape = Month),size=12, stroke =3) + # add the point markers
-
-  geom_path(data = df_ell.cTurf.Treatment, aes(x = NMDS1, y = NMDS2, col = Damselfish, linetype = Month), size = 4)+ #this is the ellipse
-  geom_text(data = cTurf.species.scores, aes(x = NMDS1, y = NMDS2, label = species),colour = "grey25", size = 10) +
+  # add the point markers
+  geom_point(data=cTurf.site.scores,aes(x=NMDS1,y=NMDS2, colour=Damselfish, shape = Month),size=12, stroke =3) + 
+  
+  # add ellipse
+  geom_path(data = df_ell.cTurf.Treatment, aes(x = NMDS1, y = NMDS2, col = Damselfish, linetype = Month), size = 4)+ 
+  
+  # add species labels
+  geom_text_repel(data = cTurf.species.scores, aes(x = NMDS1, y = NMDS2, label = species),colour = "grey25", size = 10) +
+  
+  # add stats
   geom_text(aes(x = -1.3, y = 0.85, label = "Stress = 0.08\nSpecies: P < 0.001 \nMonth: P = 0.005 \nSpecies X Month: P = 0.02"), size = 13, hjust = 0) +
+  geom_hline(yintercept = 0, linetype = 2, alpha = 0.3) +
+  geom_vline(xintercept = 0, linetype = 2, alpha = 0.3) +
   scale_colour_manual(values = c("Stegastes nigricans" = "navy",
                                  "Stegastes punctatus" = "dodgerblue"),
                       label = c(expression(italic("S. nigricans")),

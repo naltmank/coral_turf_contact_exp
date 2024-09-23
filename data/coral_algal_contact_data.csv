@@ -1,0 +1,337 @@
+Date,Week,Table.no,Sample.ID,Block,Coral.treatment,Algal.treatment,Reading,Yield
+3/7/22,1,Table 1,AP-TM-1,1,Acropora pulchra,Turf mimic,430,0.43
+3/7/22,1,Table 1,AP-AM-1,1,Acropora pulchra,Amansia,389,0.389
+3/7/22,1,Table 1,AP-SP-1,1,Acropora pulchra,S punctatus turf,313,0.313
+3/7/22,1,Table 1,AP-E-1,1,Acropora pulchra,Empty,401,0.401
+3/7/22,1,Table 1,AP-SN-1,1,Acropora pulchra,S nigricans turf,331,0.331
+3/7/22,1,Table 1,AP-MM-1,1,Acropora pulchra,Macroalgae mimic,435,0.435
+3/7/22,1,Table 1,AP-SG-1,1,Acropora pulchra,Sargassum,397,0.397
+3/7/22,1,Table 1,AP-SN-2,2,Acropora pulchra,S nigricans turf,427,0.427
+3/7/22,1,Table 1,AP-MM-2,2,Acropora pulchra,Macroalgae mimic,547,0.547
+3/7/22,1,Table 1,AP-AM-2,2,Acropora pulchra,Amansia,528,0.528
+3/7/22,1,Table 1,AP-SP-2,2,Acropora pulchra,S punctatus turf,286,0.286
+3/7/22,1,Table 1,AP-SG-2,2,Acropora pulchra,Sargassum,478,0.478
+3/7/22,1,Table 1,AP-TM-2,2,Acropora pulchra,Turf mimic,503,0.503
+3/7/22,1,Table 1,AP-E-2,2,Acropora pulchra,Empty,430,0.43
+3/7/22,1,Table 1,AP-AM-3,3,Acropora pulchra,Amansia,522,0.522
+3/7/22,1,Table 1,AP-MM-3,3,Acropora pulchra,Macroalgae mimic,559,0.559
+3/7/22,1,Table 1,AP-SG-3,3,Acropora pulchra,Sargassum,374,0.374
+3/7/22,1,Table 1,AP-SN-3,3,Acropora pulchra,S nigricans turf,418,0.418
+3/7/22,1,Table 1,AP-E-3,3,Acropora pulchra,Empty,479,0.479
+3/7/22,1,Table 1,AP-TM-3,3,Acropora pulchra,Turf mimic,523,0.523
+3/7/22,1,Table 1,AP-SP-3,3,Acropora pulchra,S punctatus turf,443,0.443
+3/7/22,1,Table 1,AP-SN-4,4,Acropora pulchra,S nigricans turf,349,0.349
+3/7/22,1,Table 1,AP-MM-4,4,Acropora pulchra,Macroalgae mimic,88,0.088
+3/7/22,1,Table 1,AP-E-4,4,Acropora pulchra,Empty,514,0.514
+3/7/22,1,Table 1,AP-AM-4,4,Acropora pulchra,Amansia,520,0.52
+3/7/22,1,Table 1,AP-TM-4,4,Acropora pulchra,Turf mimic,521,0.521
+3/7/22,1,Table 1,AP-SP-4,4,Acropora pulchra,S punctatus turf,360,0.36
+3/7/22,1,Table 1,AP-SG-4,4,Acropora pulchra,Sargassum,479,0.479
+3/7/22,1,Table 1,AP-SP-5,5,Acropora pulchra,S punctatus turf,442,0.442
+3/7/22,1,Table 1,AP-TM-5,5,Acropora pulchra,Turf mimic,447,0.447
+3/7/22,1,Table 1,AP-AM-5,5,Acropora pulchra,Amansia,514,0.514
+3/7/22,1,Table 1,AP-E-5,5,Acropora pulchra,Empty,403,0.403
+3/7/22,1,Table 1,AP-SN-5,5,Acropora pulchra,S nigricans turf,363,0.363
+3/7/22,1,Table 1,AP-MM-5,5,Acropora pulchra,Macroalgae mimic,453,0.453
+3/7/22,1,Table 1,AP-SG-5,5,Acropora pulchra,Sargassum,470,0.47
+3/7/22,1,Table 1,AP-SP-6,6,Acropora pulchra,S punctatus turf,316,0.316
+3/7/22,1,Table 1,AP-AM-6,6,Acropora pulchra,Amansia,407,0.407
+3/7/22,1,Table 1,AP-MM-6,6,Acropora pulchra,Macroalgae mimic,496,0.496
+3/7/22,1,Table 1,AP-E-6,6,Acropora pulchra,Empty,506,0.506
+3/7/22,1,Table 1,AP-TM-6,6,Acropora pulchra,Turf mimic,437,0.437
+3/7/22,1,Table 1,AP-SG-6,6,Acropora pulchra,Sargassum,404,0.404
+3/7/22,1,Table 1,AP-SN-6,6,Acropora pulchra,S nigricans turf,305,0.305
+3/7/22,1,Table 1,AP-SG-7,7,Acropora pulchra,Sargassum,344,0.344
+3/7/22,1,Table 1,AP-SN-7,7,Acropora pulchra,S nigricans turf,321,0.321
+3/7/22,1,Table 1,AP-E-7,7,Acropora pulchra,Empty,407,0.407
+3/8/22,1,Table 2,AP-TM-7,7,Acropora pulchra,Turf mimic,497,0.497
+3/8/22,1,Table 2,AP-MM-7,7,Acropora pulchra,Macroalgae mimic,614,0.614
+3/8/22,1,Table 2,AP-AM-7,7,Acropora pulchra,Amansia,512,0.512
+3/8/22,1,Table 2,AP-SP-7,7,Acropora pulchra,S punctatus turf,370,0.37
+3/8/22,1,Table 2,AP-TM-8,8,Acropora pulchra,Turf mimic,526,0.526
+3/8/22,1,Table 2,AP-AM-8,8,Acropora pulchra,Amansia,592,0.592
+3/8/22,1,Table 2,AP-SN-8,8,Acropora pulchra,S nigricans turf,477,0.477
+3/8/22,1,Table 2,AP-SP-8,8,Acropora pulchra,S punctatus turf,445,0.445
+3/8/22,1,Table 2,AP-SG-8,8,Acropora pulchra,Sargassum,569,0.569
+3/8/22,1,Table 2,AP-E-8,8,Acropora pulchra,Empty,497,0.497
+3/8/22,1,Table 2,AP-MM-8,8,Acropora pulchra,Macroalgae mimic,509,0.509
+3/8/22,1,Table 2,AP-SG-9,9,Acropora pulchra,Sargassum,452,0.452
+3/8/22,1,Table 2,AP-TM-9,9,Acropora pulchra,Turf mimic,459,0.459
+3/8/22,1,Table 2,AP-AM-9,9,Acropora pulchra,Amansia,488,0.488
+3/8/22,1,Table 2,AP-SP-9,9,Acropora pulchra,S punctatus turf,394,0.394
+3/8/22,1,Table 2,AP-MM-9,9,Acropora pulchra,Macroalgae mimic,522,0.522
+3/8/22,1,Table 2,AP-SN-9,9,Acropora pulchra,S nigricans turf,441,0.441
+3/8/22,1,Table 2,AP-E-9,9,Acropora pulchra,Empty,462,0.462
+3/8/22,1,Table 2,AP-SN-10,10,Acropora pulchra,S nigricans turf,261,0.261
+3/8/22,1,Table 2,AP-SP-10,10,Acropora pulchra,S punctatus turf,317,0.317
+3/8/22,1,Table 2,AP-E-10,10,Acropora pulchra,Empty,490,0.49
+3/8/22,1,Table 2,AP-MM-10,10,Acropora pulchra,Macroalgae mimic,522,0.522
+3/8/22,1,Table 2,AP-AM-10,10,Acropora pulchra,Amansia,470,0.47
+3/8/22,1,Table 2,AP-TM-10,10,Acropora pulchra,Turf mimic,475,0.475
+3/8/22,1,Table 2,AP-SG-10,10,Acropora pulchra,Sargassum,430,0.43
+3/8/22,1,Table 2,AP-MM-11,11,Acropora pulchra,Macroalgae mimic,495,0.495
+3/8/22,1,Table 2,AP-SP-11,11,Acropora pulchra,S punctatus turf,356,0.356
+3/8/22,1,Table 2,AP-AM-11,11,Acropora pulchra,Amansia,414,0.414
+3/8/22,1,Table 2,AP-TM-11,11,Acropora pulchra,Turf mimic,494,0.494
+3/8/22,1,Table 2,AP-SN-11,11,Acropora pulchra,S nigricans turf,335,0.335
+3/8/22,1,Table 2,AP-E-11,11,Acropora pulchra,Empty,421,0.421
+3/8/22,1,Table 2,AP-SG-11,11,Acropora pulchra,Sargassum,488,0.488
+3/8/22,1,Table 2,AP-SP-12,12,Acropora pulchra,S punctatus turf,342,0.342
+3/8/22,1,Table 2,AP-SN-12,12,Acropora pulchra,S nigricans turf,382,0.382
+3/8/22,1,Table 2,AP-SG-12,12,Acropora pulchra,Sargassum,490,0.49
+3/8/22,1,Table 2,AP-MM-12,12,Acropora pulchra,Macroalgae mimic,420,0.42
+3/8/22,1,Table 2,AP-E-12,12,Acropora pulchra,Empty,473,0.473
+3/8/22,1,Table 2,AP-TM-12,12,Acropora pulchra,Turf mimic,442,0.442
+3/8/22,1,Table 2,AP-AM-12,12,Acropora pulchra,Amansia,466,0.466
+3/15/22,2,Table 1,AP-TM-1,1,Acropora pulchra,Turf mimic,528,0.528
+3/15/22,2,Table 1,AP-AM-1,1,Acropora pulchra,Amansia,304,0.304
+3/15/22,2,Table 1,AP-SP-1,1,Acropora pulchra,S punctatus turf,296,0.296
+3/15/22,2,Table 1,AP-E-1,1,Acropora pulchra,Empty,509,0.509
+3/15/22,2,Table 1,AP-SN-1,1,Acropora pulchra,S nigricans turf,293,0.293
+3/15/22,2,Table 1,AP-MM-1,1,Acropora pulchra,Macroalgae mimic,477,0.477
+3/15/22,2,Table 1,AP-SG-1,1,Acropora pulchra,Sargassum,284,0.284
+3/15/22,2,Table 1,AP-SN-2,2,Acropora pulchra,S nigricans turf,302,0.302
+3/15/22,2,Table 1,AP-MM-2,2,Acropora pulchra,Macroalgae mimic,666,0.666
+3/15/22,2,Table 1,AP-AM-2,2,Acropora pulchra,Amansia,346,0.346
+3/15/22,2,Table 1,AP-SP-2,2,Acropora pulchra,S punctatus turf,302,0.302
+3/15/22,2,Table 1,AP-SG-2,2,Acropora pulchra,Sargassum,241,0.241
+3/15/22,2,Table 1,AP-TM-2,2,Acropora pulchra,Turf mimic,525,0.525
+3/15/22,2,Table 1,AP-E-2,2,Acropora pulchra,Empty,525,0.525
+3/15/22,2,Table 1,AP-AM-3,3,Acropora pulchra,Amansia,456,0.456
+3/15/22,2,Table 1,AP-MM-3,3,Acropora pulchra,Macroalgae mimic,526,0.526
+3/15/22,2,Table 1,AP-SG-3,3,Acropora pulchra,Sargassum,537,0.537
+3/15/22,2,Table 1,AP-SN-3,3,Acropora pulchra,S nigricans turf,423,0.423
+3/15/22,2,Table 1,AP-E-3,3,Acropora pulchra,Empty,470,0.47
+3/15/22,2,Table 1,AP-TM-3,3,Acropora pulchra,Turf mimic,518,0.518
+3/15/22,2,Table 1,AP-SP-3,3,Acropora pulchra,S punctatus turf,506,0.506
+3/15/22,2,Table 1,AP-SN-4,4,Acropora pulchra,S nigricans turf,318,0.318
+3/15/22,2,Table 1,AP-MM-4,4,Acropora pulchra,Macroalgae mimic,422,0.422
+3/15/22,2,Table 1,AP-E-4,4,Acropora pulchra,Empty,544,0.544
+3/15/22,2,Table 1,AP-AM-4,4,Acropora pulchra,Amansia,341,0.341
+3/15/22,2,Table 1,AP-TM-4,4,Acropora pulchra,Turf mimic,594,0.594
+3/15/22,2,Table 1,AP-SP-4,4,Acropora pulchra,S punctatus turf,304,0.304
+3/15/22,2,Table 1,AP-SG-4,4,Acropora pulchra,Sargassum,437,0.437
+3/15/22,2,Table 1,AP-SP-5,5,Acropora pulchra,S punctatus turf,445,0.445
+3/15/22,2,Table 1,AP-TM-5,5,Acropora pulchra,Turf mimic,455,0.455
+3/15/22,2,Table 1,AP-AM-5,5,Acropora pulchra,Amansia,435,0.435
+3/15/22,2,Table 1,AP-E-5,5,Acropora pulchra,Empty,419,0.419
+3/15/22,2,Table 1,AP-SN-5,5,Acropora pulchra,S nigricans turf,277,0.277
+3/15/22,2,Table 1,AP-MM-5,5,Acropora pulchra,Macroalgae mimic,494,0.494
+3/15/22,2,Table 1,AP-SG-5,5,Acropora pulchra,Sargassum,473,0.473
+3/15/22,2,Table 1,AP-SP-6,6,Acropora pulchra,S punctatus turf,228,0.228
+3/15/22,2,Table 1,AP-AM-6,6,Acropora pulchra,Amansia,466,0.466
+3/15/22,2,Table 1,AP-MM-6,6,Acropora pulchra,Macroalgae mimic,525,0.525
+3/15/22,2,Table 1,AP-E-6,6,Acropora pulchra,Empty,510,0.51
+3/15/22,2,Table 1,AP-TM-6,6,Acropora pulchra,Turf mimic,456,0.456
+3/15/22,2,Table 1,AP-SG-6,6,Acropora pulchra,Sargassum,378,0.378
+3/15/22,2,Table 1,AP-SN-6,6,Acropora pulchra,S nigricans turf,301,0.301
+3/15/22,2,Table 1,AP-SG-7,7,Acropora pulchra,Sargassum,522,0.522
+3/15/22,2,Table 1,AP-SN-7,7,Acropora pulchra,S nigricans turf,386,0.386
+3/15/22,2,Table 1,AP-E-7,7,Acropora pulchra,Empty,528,0.528
+3/16/22,2,Table 2,AP-TM-7,7,Acropora pulchra,Turf mimic,519,0.519
+3/16/22,2,Table 2,AP-MM-7,7,Acropora pulchra,Macroalgae mimic,584,0.584
+3/16/22,2,Table 2,AP-AM-7,7,Acropora pulchra,Amansia,435,0.435
+3/16/22,2,Table 2,AP-SP-7,7,Acropora pulchra,S punctatus turf,310,0.31
+3/16/22,2,Table 2,AP-TM-8,8,Acropora pulchra,Turf mimic,513,0.513
+3/16/22,2,Table 2,AP-AM-8,8,Acropora pulchra,Amansia,551,0.551
+3/16/22,2,Table 2,AP-SN-8,8,Acropora pulchra,S nigricans turf,400,0.4
+3/16/22,2,Table 2,AP-SP-8,8,Acropora pulchra,S punctatus turf,185,0.185
+3/16/22,2,Table 2,AP-SG-8,8,Acropora pulchra,Sargassum,517,0.517
+3/16/22,2,Table 2,AP-E-8,8,Acropora pulchra,Empty,561,0.561
+3/16/22,2,Table 2,AP-MM-8,8,Acropora pulchra,Macroalgae mimic,575,0.575
+3/16/22,2,Table 2,AP-SG-9,9,Acropora pulchra,Sargassum,461,0.461
+3/16/22,2,Table 2,AP-TM-9,9,Acropora pulchra,Turf mimic,498,0.498
+3/16/22,2,Table 2,AP-AM-9,9,Acropora pulchra,Amansia,456,0.456
+3/16/22,2,Table 2,AP-SP-9,9,Acropora pulchra,S punctatus turf,315,0.315
+3/16/22,2,Table 2,AP-MM-9,9,Acropora pulchra,Macroalgae mimic,512,0.512
+3/16/22,2,Table 2,AP-SN-9,9,Acropora pulchra,S nigricans turf,335,0.335
+3/16/22,2,Table 2,AP-E-9,9,Acropora pulchra,Empty,480,0.48
+3/16/22,2,Table 2,AP-SN-10,10,Acropora pulchra,S nigricans turf,354,0.354
+3/16/22,2,Table 2,AP-SP-10,10,Acropora pulchra,S punctatus turf,356,0.356
+3/16/22,2,Table 2,AP-E-10,10,Acropora pulchra,Empty,512,0.512
+3/16/22,2,Table 2,AP-MM-10,10,Acropora pulchra,Macroalgae mimic,526,0.526
+3/16/22,2,Table 2,AP-AM-10,10,Acropora pulchra,Amansia,518,0.518
+3/16/22,2,Table 2,AP-TM-10,10,Acropora pulchra,Turf mimic,503,0.503
+3/16/22,2,Table 2,AP-SG-10,10,Acropora pulchra,Sargassum,390,0.39
+3/16/22,2,Table 2,AP-MM-11,11,Acropora pulchra,Macroalgae mimic,463,0.463
+3/16/22,2,Table 2,AP-SP-11,11,Acropora pulchra,S punctatus turf,344,0.344
+3/16/22,2,Table 2,AP-AM-11,11,Acropora pulchra,Amansia,586,0.586
+3/16/22,2,Table 2,AP-TM-11,11,Acropora pulchra,Turf mimic,535,0.535
+3/16/22,2,Table 2,AP-SN-11,11,Acropora pulchra,S nigricans turf,407,0.407
+3/16/22,2,Table 2,AP-E-11,11,Acropora pulchra,Empty,546,0.546
+3/16/22,2,Table 2,AP-SG-11,11,Acropora pulchra,Sargassum,448,0.448
+3/16/22,2,Table 2,AP-SP-12,12,Acropora pulchra,S punctatus turf,427,0.427
+3/16/22,2,Table 2,AP-SN-12,12,Acropora pulchra,S nigricans turf,440,0.44
+3/16/22,2,Table 2,AP-SG-12,12,Acropora pulchra,Sargassum,584,0.584
+3/16/22,2,Table 2,AP-MM-12,12,Acropora pulchra,Macroalgae mimic,535,0.535
+3/16/22,2,Table 2,AP-E-12,12,Acropora pulchra,Empty,523,0.523
+3/16/22,2,Table 2,AP-TM-12,12,Acropora pulchra,Turf mimic,470,0.47
+3/16/22,2,Table 2,AP-AM-12,12,Acropora pulchra,Amansia,463,0.463
+3/7/22,1,Table 1,PR-SN-1,1,Porites rus,S nigricans turf,387,0.387
+3/7/22,1,Table 1,PR-TM-1,1,Porites rus,Turf mimic,397,0.397
+3/7/22,1,Table 1,PR-E-1,1,Porites rus,Empty,467,0.467
+3/7/22,1,Table 1,PR-MM-1,1,Porites rus,Macroalgae mimic,449,0.449
+3/7/22,1,Table 1,PR-SG-1,1,Porites rus,Sargassum,557,0.557
+3/7/22,1,Table 1,PR-AM-1,1,Porites rus,Amansia,530,0.53
+3/7/22,1,Table 1,PR-SP-1,1,Porites rus,S punctatus turf,230,0.23
+3/7/22,1,Table 1,PR-SP-2,2,Porites rus,S punctatus turf,377,0.377
+3/7/22,1,Table 1,PR-AM-2,2,Porites rus,Amansia,502,0.502
+3/7/22,1,Table 1,PR-E-2,2,Porites rus,Empty,519,0.519
+3/7/22,1,Table 1,PR-SN-2,2,Porites rus,S nigricans turf,394,0.394
+3/7/22,1,Table 1,PR-SG-2,2,Porites rus,Sargassum,517,0.517
+3/7/22,1,Table 1,PR-TM-2,2,Porites rus,Turf mimic,472,0.472
+3/7/22,1,Table 1,PR-MM-2,2,Porites rus,Macroalgae mimic,468,0.468
+3/7/22,1,Table 1,PR-SN-3,3,Porites rus,S nigricans turf,433,0.433
+3/7/22,1,Table 1,PR-SP-3,3,Porites rus,S punctatus turf,301,0.301
+3/7/22,1,Table 1,PR-TM-3,3,Porites rus,Turf mimic,506,0.506
+3/7/22,1,Table 1,PR-E-3,3,Porites rus,Empty,451,0.451
+3/7/22,1,Table 1,PR-SG-3,3,Porites rus,Sargassum,527,0.527
+3/7/22,1,Table 1,PR-MM-3,3,Porites rus,Macroalgae mimic,513,0.513
+3/7/22,1,Table 1,PR-AM-3,3,Porites rus,Amansia,356,0.356
+3/7/22,1,Table 1,PR-SP-4,4,Porites rus,S punctatus turf,341,0.341
+3/7/22,1,Table 1,PR-MM-4,4,Porites rus,Macroalgae mimic,455,0.455
+3/7/22,1,Table 1,PR-TM-4,4,Porites rus,Turf mimic,539,0.539
+3/7/22,1,Table 1,PR-E-4,4,Porites rus,Empty,514,0.514
+3/7/22,1,Table 1,PR-SN-4,4,Porites rus,S nigricans turf,415,0.415
+3/7/22,1,Table 1,PR-SG-4,4,Porites rus,Sargassum,570,0.57
+3/7/22,1,Table 1,PR-AM-4,4,Porites rus,Amansia,377,0.377
+3/7/22,1,Table 1,PR-MM-5,5,Porites rus,Macroalgae mimic,585,0.585
+3/7/22,1,Table 1,PR-SG-5,5,Porites rus,Sargassum,539,0.539
+3/7/22,1,Table 1,PR-SP-5,5,Porites rus,S punctatus turf,355,0.355
+3/7/22,1,Table 1,PR-TM-5,5,Porites rus,Turf mimic,475,0.475
+3/7/22,1,Table 1,PR-E-5,5,Porites rus,Empty,498,0.498
+3/7/22,1,Table 1,PR-SN-5,5,Porites rus,S nigricans turf,450,0.45
+3/7/22,1,Table 1,PR-AM-5,5,Porites rus,Amansia,407,0.407
+3/7/22,1,Table 1,PR-SP-6,6,Porites rus,S punctatus turf,362,0.362
+3/7/22,1,Table 1,PR-TM-6,6,Porites rus,Turf mimic,504,0.504
+3/7/22,1,Table 1,PR-AM-6,6,Porites rus,Amansia,506,0.506
+3/7/22,1,Table 1,PR-SG-6,6,Porites rus,Sargassum,463,0.463
+3/7/22,1,Table 1,PR-SN-6,6,Porites rus,S nigricans turf,252,0.252
+3/7/22,1,Table 1,PR-MM-6,6,Porites rus,Macroalgae mimic,427,0.427
+3/7/22,1,Table 1,PR-E-6,6,Porites rus,Empty,402,0.402
+3/8/22,1,Table 2,PR-SP-7,7,Porites rus,S punctatus turf,251,0.251
+3/8/22,1,Table 2,PR-TM-7,7,Porites rus,Turf mimic,417,0.417
+3/8/22,1,Table 2,PR-AM-7,7,Porites rus,Amansia,534,0.534
+3/8/22,1,Table 2,PR-SN-7,7,Porites rus,S nigricans turf,345,0.345
+3/8/22,1,Table 2,PR-MM-7,7,Porites rus,Macroalgae mimic,576,0.576
+3/8/22,1,Table 2,PR-E-7,7,Porites rus,Empty,479,0.479
+3/8/22,1,Table 2,PR-SG-7,7,Porites rus,Sargassum,435,0.435
+3/8/22,1,Table 2,PR-E-8,8,Porites rus,Empty,547,0.547
+3/8/22,1,Table 2,PR-AM-8,8,Porites rus,Amansia,413,0.413
+3/8/22,1,Table 2,PR-SG-8,8,Porites rus,Sargassum,580,0.58
+3/8/22,1,Table 2,PR-TM-8,8,Porites rus,Turf mimic,541,0.541
+3/8/22,1,Table 2,PR-SP-8,8,Porites rus,S punctatus turf,162,0.162
+3/8/22,1,Table 2,PR-SN-8,8,Porites rus,S nigricans turf,448,0.448
+3/8/22,1,Table 2,PR-MM-8,8,Porites rus,Macroalgae mimic,578,0.578
+3/8/22,1,Table 2,PR-SN-9,9,Porites rus,S nigricans turf,233,0.233
+3/8/22,1,Table 2,PR-AM-9,9,Porites rus,Amansia,515,0.515
+3/8/22,1,Table 2,PR-MM-9,9,Porites rus,Macroalgae mimic,512,0.512
+3/8/22,1,Table 2,PR-E-9,9,Porites rus,Empty,504,0.504
+3/8/22,1,Table 2,PR-SP-9,9,Porites rus,S punctatus turf,332,0.332
+3/8/22,1,Table 2,PR-AM-9,9,Porites rus,Amansia,501,0.501
+3/8/22,1,Table 2,PR-SG-9,9,Porites rus,Sargassum,248,0.248
+3/8/22,1,Table 2,PR-SG-10,10,Porites rus,Sargassum,568,0.568
+3/8/22,1,Table 2,PR-MM-10,10,Porites rus,Macroalgae mimic,643,0.643
+3/8/22,1,Table 2,PR-E-10,10,Porites rus,Empty,491,0.491
+3/8/22,1,Table 2,PR-TM-10,10,Porites rus,Turf mimic,500,0.5
+3/8/22,1,Table 2,PR-SN-10,10,Porites rus,S nigricans turf,448,0.448
+3/8/22,1,Table 2,PR-SP-10,10,Porites rus,S punctatus turf,326,0.326
+3/8/22,1,Table 2,PR-AM-10,10,Porites rus,Amansia,248,0.248
+3/8/22,1,Table 2,PR-TM-11,11,Porites rus,Turf mimic,522,0.522
+3/8/22,1,Table 2,PR-MM-11,11,Porites rus,Macroalgae mimic,605,0.605
+3/8/22,1,Table 2,PR-E-11,11,Porites rus,Empty,484,0.484
+3/8/22,1,Table 2,PR-SN-11,11,Porites rus,S nigricans turf,409,0.409
+3/8/22,1,Table 2,PR-SG-11,11,Porites rus,Sargassum,367,0.367
+3/8/22,1,Table 2,PR-SP-11,11,Porites rus,S punctatus turf,210,0.21
+3/8/22,1,Table 2,PR-AM-11,11,Porites rus,Amansia,434,0.434
+3/8/22,1,Table 2,PR-TM-12,12,Porites rus,Turf mimic,442,0.442
+3/8/22,1,Table 2,PR-AM-12,12,Porites rus,Amansia,339,0.339
+3/8/22,1,Table 2,PR-SP-12,12,Porites rus,S punctatus turf,437,0.437
+3/8/22,1,Table 2,PR-SG-12,12,Porites rus,Sargassum,576,0.576
+3/8/22,1,Table 2,PR-MM-12,12,Porites rus,Macroalgae mimic,354,0.354
+3/8/22,1,Table 2,PR-E-12,12,Porites rus,Empty,468,0.468
+3/8/22,1,Table 2,PR-SN-12,12,Porites rus,S nigricans turf,366,0.366
+3/15/22,2,Table 1,PR-SN-1,1,Porites rus,S nigricans turf,223,0.223
+3/15/22,2,Table 1,PR-TM-1,1,Porites rus,Turf mimic,588,0.588
+3/15/22,2,Table 1,PR-E-1,1,Porites rus,Empty,493,0.493
+3/15/22,2,Table 1,PR-MM-1,1,Porites rus,Macroalgae mimic,354,0.354
+3/15/22,2,Table 1,PR-SG-1,1,Porites rus,Sargassum,392,0.392
+3/15/22,2,Table 1,PR-AM-1,1,Porites rus,Amansia,478,0.478
+3/15/22,2,Table 1,PR-SP-1,1,Porites rus,S punctatus turf,297,0.297
+3/15/22,2,Table 1,PR-SP-2,2,Porites rus,S punctatus turf,277,0.277
+3/15/22,2,Table 1,PR-AM-2,2,Porites rus,Amansia,548,0.548
+3/15/22,2,Table 1,PR-E-2,2,Porites rus,Empty,532,0.532
+3/15/22,2,Table 1,PR-SN-2,2,Porites rus,S nigricans turf,250,0.25
+3/15/22,2,Table 1,PR-SG-2,2,Porites rus,Sargassum,493,0.493
+3/15/22,2,Table 1,PR-TM-2,2,Porites rus,Turf mimic,557,0.557
+3/15/22,2,Table 1,PR-MM-2,2,Porites rus,Macroalgae mimic,537,0.537
+3/15/22,2,Table 1,PR-SN-3,3,Porites rus,S nigricans turf,355,0.355
+3/15/22,2,Table 1,PR-SP-3,3,Porites rus,S punctatus turf,176,0.176
+3/15/22,2,Table 1,PR-TM-3,3,Porites rus,Turf mimic,493,0.493
+3/15/22,2,Table 1,PR-E-3,3,Porites rus,Empty,554,0.554
+3/15/22,2,Table 1,PR-SG-3,3,Porites rus,Sargassum,448,0.448
+3/15/22,2,Table 1,PR-MM-3,3,Porites rus,Macroalgae mimic,481,0.481
+3/15/22,2,Table 1,PR-AM-3,3,Porites rus,Amansia,358,0.358
+3/15/22,2,Table 1,PR-SP-4,4,Porites rus,S punctatus turf,203,0.203
+3/15/22,2,Table 1,PR-MM-4,4,Porites rus,Macroalgae mimic,531,0.531
+3/15/22,2,Table 1,PR-TM-4,4,Porites rus,Turf mimic,489,0.489
+3/15/22,2,Table 1,PR-E-4,4,Porites rus,Empty,465,0.465
+3/15/22,2,Table 1,PR-SN-4,4,Porites rus,S nigricans turf,361,0.361
+3/15/22,2,Table 1,PR-SG-4,4,Porites rus,Sargassum,486,0.486
+3/15/22,2,Table 1,PR-AM-4,4,Porites rus,Amansia,431,0.431
+3/15/22,2,Table 1,PR-MM-5,5,Porites rus,Macroalgae mimic,494,0.494
+3/15/22,2,Table 1,PR-SG-5,5,Porites rus,Sargassum,379,0.379
+3/15/22,2,Table 1,PR-SP-5,5,Porites rus,S punctatus turf,227,0.227
+3/15/22,2,Table 1,PR-TM-5,5,Porites rus,Turf mimic,552,0.552
+3/15/22,2,Table 1,PR-E-5,5,Porites rus,Empty,486,0.486
+3/15/22,2,Table 1,PR-SN-5,5,Porites rus,S nigricans turf,240,0.24
+3/15/22,2,Table 1,PR-AM-5,5,Porites rus,Amansia,465,0.465
+3/15/22,2,Table 1,PR-SP-6,6,Porites rus,S punctatus turf,162,0.162
+3/15/22,2,Table 1,PR-TM-6,6,Porites rus,Turf mimic,472,0.472
+3/15/22,2,Table 1,PR-AM-6,6,Porites rus,Amansia,401,0.401
+3/15/22,2,Table 1,PR-SG-6,6,Porites rus,Sargassum,460,0.46
+3/15/22,2,Table 1,PR-SN-6,6,Porites rus,S nigricans turf,165,0.165
+3/15/22,2,Table 1,PR-MM-6,6,Porites rus,Macroalgae mimic,440,0.44
+3/15/22,2,Table 1,PR-E-6,6,Porites rus,Empty,534,0.534
+3/16/22,2,Table 2,PR-SP-7,7,Porites rus,S punctatus turf,241,0.241
+3/16/22,2,Table 2,PR-TM-7,7,Porites rus,Turf mimic,524,0.524
+3/16/22,2,Table 2,PR-AM-7,7,Porites rus,Amansia,503,0.503
+3/16/22,2,Table 2,PR-SN-7,7,Porites rus,S nigricans turf,215,0.215
+3/16/22,2,Table 2,PR-MM-7,7,Porites rus,Macroalgae mimic,575,0.575
+3/16/22,2,Table 2,PR-E-7,7,Porites rus,Empty,540,0.54
+3/16/22,2,Table 2,PR-SG-7,7,Porites rus,Sargassum,470,0.47
+3/16/22,2,Table 2,PR-E-8,8,Porites rus,Empty,524,0.524
+3/16/22,2,Table 2,PR-AM-8,8,Porites rus,Amansia,391,0.391
+3/16/22,2,Table 2,PR-SG-8,8,Porites rus,Sargassum,524,0.524
+3/16/22,2,Table 2,PR-TM-8,8,Porites rus,Turf mimic,525,0.525
+3/16/22,2,Table 2,PR-SP-8,8,Porites rus,S punctatus turf,129,0.129
+3/16/22,2,Table 2,PR-SN-8,8,Porites rus,S nigricans turf,327,0.327
+3/16/22,2,Table 2,PR-MM-8,8,Porites rus,Macroalgae mimic,609,0.609
+3/16/22,2,Table 2,PR-SN-9,9,Porites rus,S nigricans turf,293,0.293
+3/16/22,2,Table 2,PR-AM-9,9,Porites rus,Amansia,314,0.314
+3/16/22,2,Table 2,PR-MM-9,9,Porites rus,Macroalgae mimic,606,0.606
+3/16/22,2,Table 2,PR-E-9,9,Porites rus,Empty,532,0.532
+3/16/22,2,Table 2,PR-SP-9,9,Porites rus,S punctatus turf,167,0.167
+3/16/22,2,Table 2,PR-AM-9,9,Porites rus,Amansia,546,0.546
+3/16/22,2,Table 2,PR-SG-9,9,Porites rus,Sargassum,368,0.368
+3/16/22,2,Table 2,PR-SG-10,10,Porites rus,Sargassum,589,0.589
+3/16/22,2,Table 2,PR-MM-10,10,Porites rus,Macroalgae mimic,604,0.604
+3/16/22,2,Table 2,PR-E-10,10,Porites rus,Empty,510,0.51
+3/16/22,2,Table 2,PR-TM-10,10,Porites rus,Turf mimic,459,0.459
+3/16/22,2,Table 2,PR-SN-10,10,Porites rus,S nigricans turf,372,0.372
+3/16/22,2,Table 2,PR-SP-10,10,Porites rus,S punctatus turf,328,0.328
+3/16/22,2,Table 2,PR-AM-10,10,Porites rus,Amansia,255,0.255
+3/16/22,2,Table 2,PR-TM-11,11,Porites rus,Turf mimic,547,0.547
+3/16/22,2,Table 2,PR-MM-11,11,Porites rus,Macroalgae mimic,395,0.395
+3/16/22,2,Table 2,PR-E-11,11,Porites rus,Empty,557,0.557
+3/16/22,2,Table 2,PR-SN-11,11,Porites rus,S nigricans turf,449,0.449
+3/16/22,2,Table 2,PR-SG-11,11,Porites rus,Sargassum,302,0.302
+3/16/22,2,Table 2,PR-SP-11,11,Porites rus,S punctatus turf,188,0.188
+3/16/22,2,Table 2,PR-AM-11,11,Porites rus,Amansia,426,0.426
+3/16/22,2,Table 2,PR-TM-12,12,Porites rus,Turf mimic,582,0.582
+3/16/22,2,Table 2,PR-AM-12,12,Porites rus,Amansia,380,0.38
+3/16/22,2,Table 2,PR-SP-12,12,Porites rus,S punctatus turf,145,0.145
+3/16/22,2,Table 2,PR-SG-12,12,Porites rus,Sargassum,584,0.584
+3/16/22,2,Table 2,PR-MM-12,12,Porites rus,Macroalgae mimic,345,0.345
+3/16/22,2,Table 2,PR-E-12,12,Porites rus,Empty,542,0.542
+3/16/22,2,Table 2,PR-SN-12,12,Porites rus,S nigricans turf,106,0.106

@@ -1,0 +1,73 @@
+Date,Table.coordinate,Sample.ID,Colony.no,Coral.treatment,Algal.treatment,Colony.ID,Reading,Yield,Colony ID control yield
+03/28/2022,A3,AP-C-1,1,Acropora pulchra,Control,Acropora pulchra 1,487,0.487,0.487
+03/28/2022,A2,AP-N-1,1,Acropora pulchra,S nigricans turf,Acropora pulchra 1,339,0.339,0.487
+03/28/2022,A5,AP-P-1,1,Acropora pulchra,S punctatus turf,Acropora pulchra 1,417,0.417,0.487
+03/28/2022,E9,AP-C-10,10,Acropora pulchra,Control,Acropora pulchra 10,588,0.588,0.588
+03/28/2022,EX10,AP-N-10,10,Acropora pulchra,S nigricans turf,Acropora pulchra 10,486,0.486,0.588
+03/28/2022,EX11,AP-P-10,10,Acropora pulchra,S punctatus turf,Acropora pulchra 10,462,0.462,0.588
+03/28/2022,F3,AP-C-1,11,Acropora pulchra,Control,Acropora pulchra 11,542,0.542,0.542
+03/28/2022,F6,AP-N-11,11,Acropora pulchra,S nigricans turf,Acropora pulchra 11,339,0.339,0.542
+03/28/2022,F5,AP-P-11,11,Acropora pulchra,S punctatus turf,Acropora pulchra 11,505,0.505,0.542
+03/28/2022,FX11,AP-C-12,12,Acropora pulchra,Control,Acropora pulchra 12,492,0.492,0.492
+03/28/2022,FX10,AP-N-12,12,Acropora pulchra,S nigricans turf,Acropora pulchra 12,399,0.399,0.492
+03/28/2022,FX12,AP-P-12,12,Acropora pulchra,S punctatus turf,Acropora pulchra 12,410,0.41,0.492
+03/28/2022,A7,AP-C-2,2,Acropora pulchra,Control,Acropora pulchra 2,557,0.557,0.557
+03/28/2022,AX12,AP-N-2,2,Acropora pulchra,S nigricans turf,Acropora pulchra 2,356,0.356,0.557
+03/28/2022,AX11,AP-P-2,2,Acropora pulchra,S punctatus turf,Acropora pulchra 2,179,0.179,0.557
+03/28/2022,B1,AP-C-3,3,Acropora pulchra,Control,Acropora pulchra 3,520,0.52,0.52
+03/28/2022,B3,AP-N-3,3,Acropora pulchra,S nigricans turf,Acropora pulchra 3,304,0.304,0.52
+03/28/2022,B2,AP-P-3,3,Acropora pulchra,S punctatus turf,Acropora pulchra 3,312,0.312,0.52
+03/28/2022,BX11,AP-C-4,4,Acropora pulchra,Control,Acropora pulchra 4,507,0.507,0.507
+03/28/2022,BX10,AP-N-4,4,Acropora pulchra,S nigricans turf,Acropora pulchra 4,390,0.39,0.507
+03/28/2022,BX12,AP-P-4,4,Acropora pulchra,S punctatus turf,Acropora pulchra 4,384,0.384,0.507
+03/28/2022,C5,AP-C-5,5,Acropora pulchra,Control,Acropora pulchra 5,584,0.584,0.584
+03/28/2022,C1,AP-N-5,5,Acropora pulchra,S nigricans turf,Acropora pulchra 5,355,0.355,0.584
+03/28/2022,C3,AP-P-5,5,Acropora pulchra,S punctatus turf,Acropora pulchra 5,357,0.357,0.584
+03/28/2022,CX12,AP-C-6,6,Acropora pulchra,Control,Acropora pulchra 6,508,0.508,0.508
+03/28/2022,CX10,AP-N-6,6,Acropora pulchra,S nigricans turf,Acropora pulchra 6,430,0.43,0.508
+03/28/2022,CX11,AP-P-6,6,Acropora pulchra,S punctatus turf,Acropora pulchra 6,451,0.451,0.508
+03/28/2022,D2,AP-C-7,7,Acropora pulchra,Control,Acropora pulchra 7,505,0.505,0.505
+03/28/2022,D1,AP-N-7,7,Acropora pulchra,S nigricans turf,Acropora pulchra 7,478,0.478,0.505
+03/28/2022,D4,AP-P-7,7,Acropora pulchra,S punctatus turf,Acropora pulchra 7,277,0.277,0.505
+03/28/2022,D8,AP-C-8,8,Acropora pulchra,Control,Acropora pulchra 8,582,0.582,0.582
+03/28/2022,D9,AP-N-8,8,Acropora pulchra,S nigricans turf,Acropora pulchra 8,377,0.377,0.582
+03/28/2022,DX10,AP-P-8,8,Acropora pulchra,S punctatus turf,Acropora pulchra 8,490,0.49,0.582
+03/28/2022,E3,AP-C-9,9,Acropora pulchra,Control,Acropora pulchra 9,565,0.565,0.565
+03/28/2022,E5,AP-N-9,9,Acropora pulchra,S nigricans turf,Acropora pulchra 9,463,0.463,0.565
+03/28/2022,E2,AP-P-9,9,Acropora pulchra,S punctatus turf,Acropora pulchra 9,304,0.304,0.565
+03/28/2022,A4,PR-C-1,1,Porites rus,Control,Porites rus 1,580,0.58,0.58
+03/28/2022,A1,PR-N-1,1,Porites rus,S nigricans turf,Porites rus 1,554,0.554,0.58
+03/28/2022,A6,PR-P-1,1,Porites rus,S punctatus turf,Porites rus 1,446,0.446,0.58
+03/28/2022,E7,PR-C-10,10,Porites rus,Control,Porites rus 10,522,0.522,0.522
+03/28/2022,EX12,PR-N-10,10,Porites rus,S nigricans turf,Porites rus 10,444,0.444,0.522
+03/28/2022,E8,PR-P-10,10,Porites rus,S punctatus turf,Porites rus 10,457,0.457,0.522
+03/28/2022,F1,PR-C-11,11,Porites rus,Control,Porites rus 11,463,0.463,0.463
+03/28/2022,F2,PR-N011,11,Porites rus,S nigricans turf,Porites rus 11,438,0.438,0.463
+03/28/2022,F4,PR-P-11,11,Porites rus,S punctatus turf,Porites rus 11,420,0.42,0.463
+03/28/2022,F7,PR-C-12,12,Porites rus,Control,Porites rus 12,482,0.482,0.482
+03/28/2022,F9,PR-N-12,12,Porites rus,S nigricans turf,Porites rus 12,452,0.452,0.482
+03/28/2022,F8,PR-P-12,12,Porites rus,S punctatus turf,Porites rus 12,469,0.469,0.482
+03/28/2022,AX10,PR-C-2,2,Porites rus,Control,Porites rus 2,529,0.529,0.529
+03/28/2022,A9,PR-N-2,2,Porites rus,S nigricans turf,Porites rus 2,457,0.457,0.529
+03/28/2022,A8,PR-P-2,2,Porites rus,S punctatus turf,Porites rus 2,437,0.437,0.529
+03/28/2022,B4,PR-C-3,3,Porites rus,Control,Porites rus 3,475,0.475,0.475
+03/28/2022,B5,PR-N-3,3,Porites rus,S nigricans turf,Porites rus 3,511,0.511,0.475
+03/28/2022,B6,PR-P-3,3,Porites rus,S punctatus turf,Porites rus 3,523,0.523,0.475
+03/28/2022,B9,PR-C-4,4,Porites rus,Control,Porites rus 4,503,0.503,0.503
+03/28/2022,B7,PR-N-4,4,Porites rus,S nigricans turf,Porites rus 4,528,0.528,0.503
+03/28/2022,B8,PR-P-4,4,Porites rus,S punctatus turf,Porites rus 4,427,0.427,0.503
+03/28/2022,C4,PR-C-5,5,Porites rus,Control,Porites rus 5,509,0.509,0.509
+03/28/2022,C2,PR-N-5,5,Porites rus,S nigricans turf,Porites rus 5,406,0.406,0.509
+03/28/2022,C6,PR-P-5,5,Porites rus,S punctatus turf,Porites rus 5,325,0.325,0.509
+03/28/2022,C9,PR-C-6,6,Porites rus,Control,Porites rus 6,538,0.538,0.538
+03/28/2022,C8,PR-N-6,6,Porites rus,S nigricans turf,Porites rus 6,479,0.479,0.538
+03/28/2022,C7,PR-P-6,6,Porites rus,S punctatus turf,Porites rus 6,468,0.468,0.538
+03/28/2022,D3,PR-C-7,7,Porites rus,Control,Porites rus 7,522,0.522,0.522
+03/28/2022,D5,PR-N-7,7,Porites rus,S nigricans turf,Porites rus 7,413,0.413,0.522
+03/28/2022,D6,PR-P-7,7,Porites rus,S punctatus turf,Porites rus 7,460,0.46,0.522
+03/28/2022,D7,PR-C-8,8,Porites rus,Control,Porites rus 8,540,0.54,0.54
+03/28/2022,DX12,PR-N-8,8,Porites rus,S nigricans turf,Porites rus 8,472,0.472,0.54
+03/28/2022,DX11,PR-P-8,8,Porites rus,S punctatus turf,Porites rus 8,460,0.46,0.54
+03/28/2022,E4,PR-C-9,9,Porites rus,Control,Porites rus 9,514,0.514,0.514
+03/28/2022,E1,PR-N-9,9,Porites rus,S nigricans turf,Porites rus 9,498,0.498,0.514
+03/28/2022,E6,PT-P-9,9,Porites rus,S punctatus turf,Porites rus 9,489,0.489,0.514
