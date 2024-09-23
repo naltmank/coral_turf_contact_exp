@@ -1,0 +1,804 @@
+---
+title: "coral_turf_contact_exp"
+author: "Noam Altman-Kurosaki"
+date: "2024-09-23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+rm(list=ls()) # clean up
+library(knitr)
+library(plyr)
+library(car)
+library(reshape)
+library(reshape2)
+library(tidyr)
+library(effects)
+library(MASS)
+library(MuMIn)
+library(mgcv)
+library(mgcViz)
+library(sp)
+library(lattice)
+library(pbkrtest)
+library(vegan)
+library(ggplot2)
+library(ggtext)
+library(gridExtra)
+library(grid)
+library(tibble)
+library(ggrepel)
+library(rcompanion)
+library(emmeans)
+library(betareg)
+library(glmmTMB)
+library(DHARMa)
+library(devtools)
+library(tidyverse)
+library(phyloseq)   
+library(DESeq2)
+library(microbiome)
+library(picante)    
+library(ALDEx2)
+library(metagenomeSeq)  
+library(HMP) 
+library(dendextend)    
+library(selbal) 
+library(rms)
+library(breakaway)
+library(qiime2R)
+# issues with unifrac if using phyloseq
+# See: https://github.com/joey711/phyloseq/issues/956
+# Using rbiom package for calculating unifrac distances instead
+library(rbiom)
+
+opts_chunk$set(comment="  ",
+               collapse=TRUE, 
+               echo=FALSE,
+               #fig.asp=1/gr,
+               fig.height=8,
+               fig.width = 10,
+               dev="png",
+               warning=TRUE
+               )
+opts_knit$set(eval.after = "fig.cap")
+```  
+
+```{r functions}
+# create function for standard error
+se = function(x){
+  sd(x, na.rm = TRUE)/sqrt(length(x))
+}
+
+
+# function for ellipsess
+#taken from the excellent stackoverflow Q+A: http://stackoverflow.com/questions/13794419/plotting-ordiellipse-function-from-vegan-package-onto-nmds-plot-created-in-ggplo
+veganCovEllipse <- function (cov, center = c(0, 0), scale = 1, npoints = 100) 
+{
+  theta <- (0:npoints) * 2 * pi/npoints
+  Circle <- cbind(cos(theta), sin(theta))
+  t(center + scale * t(Circle %*% chol(cov)))
+}
+
+
+
+
+```
+
+```{r turf species list, eval = FALSE}
+turf = read.csv("/Users/noamaltman-kurosaki/iCloud Drive (Archive) - 1/Documents/Grad school (general)/PhD General/Coral-algal contact experiment/Supplemental materials for initial submission coral reefs/Data and code/Turf cover and PAM data/Coral-algal contact experiment - turf species list wide.csv", stringsAsFactors = T)
+turf[is.na(turf)] = 0 # set empty cells to 0
+turf$Comb.trt = as.factor(paste(turf$Damselfish.trt, "-", turf$Month.trt)) # create new factor for aggregating
+turf_list = ddply(turf, "Comb.trt", numcolwise(sum)) # sum across cob trt to get number of samples containing species of algae
+turf_list[,2:44] = turf_list[,2:44]/12 # convert turf list to show proportion of samples it was present in per stratum
+turf_list = as.data.frame(t(turf_list)) # transpose and convert to dataframe
+colnames(turf_list) = turf_list[1,] # set colnames to be the first row of the data (factor)
+turf_list = turf_list[-1,] # remove first row (repetitive to column names due to t() fxn)
+
+# write.csv(turf_list, "/Users/noamaltman-kurosaki/iCloud Drive (Archive) - 1/Documents/Grad school (general)/PhD General/Coral-algal contact experiment/Damselfish turf species list long v1.csv")
+
+```
+
+```{r turf richness, eval = FALSE}
+turf_species = turf[,unlist(lapply(turf, is.numeric))] # subset just turf species based on if the column is a numeric
+
+turf$Richness = rowSums(turf_species) # species richness for a sample found by summing across all species present in that sample
+hist(turf$Richness)
+richnessglm = glmmTMB(Richness ~ Damselfish.trt*Month.trt, data = turf, family = compois) # conway maxwell poisson
+
+plot(simulateResiduals(richnessglm)) # residuals look good
+summary(richnessglm)
+Anova(richnessglm) # No difference in richness based on damselfish (X2 = 1.1, P = 0.3), month (X2 = 0.25, P = 0.6), or their interaction (X2 = 0.70, P = 0.4)
+richness_means = ddply(turf, c("Damselfish.trt", "Month.trt"), numcolwise(mean))
+richness_se = ddply(turf, c("Damselfish.trt", "Month.trt"), numcolwise(se))
+# SN-M: 11.3 ± 0.60 
+# SN-S: 10 ± 0.72
+# SP-M: 9.5 ± 0.45
+# SP-S: 9.8 ± 0.41
+
+ggplot()+
+  geom_boxplot(data = turf, aes(x = Damselfish.trt, y = Richness, colour = Month.trt), position = position_dodge(0.9),
+               outlier.shape = NA, size = 1.1) +
+  geom_point(data = turf, aes(x = Damselfish.trt, y = Richness, colour = Month.trt),
+             size = 3, position = position_jitterdodge(dodge.width = 0.9, jitter.width = 0.3)) +
+  geom_text(aes(x = 2.5, y = 15, label = "Damselfish: P = 0.29\nMonth: P = 0.61\nInt: P = 0.40"), hjust = 1, size = 10) +
+    theme_classic() + 
+  labs(y = "Species richness\n", x = "") +
+  guides(colour=guide_legend(title="Month")) +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        legend.position = "bottom",
+        legend.key.size = unit(2, 'cm'),
+        legend.text = element_text(size=20),
+        legend.title = element_text(size=20),
+        axis.line = element_line(colour = "black"),
+        axis.text.x = element_text(color = "grey20", size = 20, hjust = .5, vjust = .5, face = "plain"),
+        axis.title.x = element_text(color = "grey20", size = 25, hjust = .5, vjust = 0, face = "plain"),
+        axis.text.y = element_text(color = "grey20", size = 20, hjust = .5, vjust = .5, face = "plain"),
+        axis.title.y = element_text(color = "grey20", size = 25, hjust = .5, vjust = 0, face = "plain"),
+        strip.text.x = element_text(color = "grey20", size = 25, hjust = .5, vjust = 0, face = "plain")
+  )
+  
+
+```
+
+```{r turf relative abundance}
+turf_cover = read.csv("/Users/noamaltman-kurosaki/iCloud Drive (Archive) - 1/Documents/Grad school (general)/PhD General/Coral-algal contact experiment/Supplemental materials for initial submission coral reefs/Data and code/Turf cover and PAM data/Coral-algal contact experiment - turf species cover.csv", stringsAsFactors = T)
+turf_cover[is.na(turf_cover)] = 0 # set empty cells to 0
+turf_cover = ddply(turf_cover, c("Damselfish.trt", "Month.trt", "Sample.ID"), numcolwise(mean) ) # average across 5 fields of view to get relative abundance per sample
+
+### FOR RELATIVE ABUNDANCE TABLE IN MS ###
+##  turf_cover_table = ddply(turf_cover, c("Damselfish.trt", "Month.trt"), numcolwise(mean) )
+##  turf_cover_table = t(turf_cover_table)
+## write.csv(turf_cover_table, "/Users/noamaltman-kurosaki/iCloud Drive (Archive) - 1/Documents/Grad school (general)/PhD General/Coral-algal contact experiment/urf cover table means.csv")
+##  
+##  turf_cover_table_se = ddply(turf_cover, c("Damselfish.trt", "Month.trt"), numcolwise(se) )
+##  turf_cover_table_se = t(turf_cover_table_se)
+##  write.csv(turf_cover_table_se, "/Users/noamaltman-kurosaki/iCloud Drive (Archive) - 1/Documents/Grad school (general)/PhD  General/Coral-algal contact experiment/urf cover table SE.csv")
+
+turf_m = data.matrix(turf_cover[,-c(1:4)]) # create matrix of just species
+turf_m = turf_m/100 # convert percentage data to proportional data
+
+rownames(turf_m) = turf_cover$Sample.ID # set sample ID as row name
+turf_m_trans = asin(sqrt(turf_m)) # create matrix with arcsin sqrt transformed data
+
+# PERMANOVA
+adonis2(vegdist(turf_m_trans, method = "bray") ~ Damselfish.trt*Month.trt, data = turf_cover) 
+# Significant difference in turf communities based on damselfish (F = 59.1, P < 0.001), month (F - 5.5, P = 0.005), and interaction (F = 3.5, P = 0.02)
+
+
+
+
+ord2 = metaMDS(turf_m_trans, dist	= "bray",	trymax	= 100,	k	= 2)
+ord2 # stress = 0.11
+
+set.seed(1032)
+ord3 = metaMDS(turf_m_trans, dist	= "bray",	trymax	= 100,	k	= 3)
+ord3 # stress = 0.08
+
+ord4 = metaMDS(turf_m_trans, dist	= "bray",	trymax	= 100,	k	= 4)
+ord4 # stress  = 0.06
+
+
+
+vegan::permutest(vegan::betadisper(vegdist(turf_m_trans, method = "bray"), as.factor(paste(turf_cover$Damselfish.trt, "-", turf_cover$Month.trt)))) # P = 0.26
+```
+
+
+```{r turf plotting, fig.height=20, fig.width=20}
+
+cTurf.site.scores = as.data.frame(scores(ord3, "sites"))  #Using the scores function from vegan to extract the site scores and convert to a data.frame
+cTurf.site.scores$Sample = rownames(cTurf.site.scores)  # create a column of site names, from the rownames of data.scores
+cTurf.site.scores$Treatment = as.factor(paste(turf_cover$Damselfish.trt, "-", turf_cover$Month.trt))  #  add the treatment as a grouping vactor
+cTurf.site.scores$Damselfish = turf_cover$Damselfish.trt
+cTurf.site.scores$Month = turf_cover$Month.trt
+
+cTurf.species.scores <- as.data.frame(scores(ord3, "species"))  #Using the scores function from vegan to extract the species scores and convert to a data.frame
+cTurf.species.scores$species <- rownames(cTurf.species.scores)  # create a column of species, from the rownames of species.scores
+
+df_ell.cTurf.Treatment <- data.frame() #sets up a data frame before running the function.
+for(g in levels(cTurf.site.scores$Treatment)){
+  df_ell.cTurf.Treatment <- rbind(df_ell.cTurf.Treatment, cbind(as.data.frame(with(cTurf.site.scores[cTurf.site.scores$Treatment==g,],                                                 veganCovEllipse(cov.wt(cbind(NMDS1,NMDS2),wt=rep(1/length(NMDS1),
+                               length(NMDS1)))$cov,center=c(mean(NMDS1),mean(NMDS2)))))
+                                      ,Treatment=g))
+}
+# bootleg way to add in factors for treatments
+df_ell.cTurf.Treatment$Damselfish = as.factor( c(rep("Stegastes nigricans", 202), rep("Stegastes punctatus", 202)) )
+df_ell.cTurf.Treatment$Month = as.factor(c(rep("March", 101), rep("September", 101),
+                                               rep("March", 101), rep("September", 101)))
+
+# data for labelling the ellipse
+NMDS.mean=aggregate(cTurf.site.scores[,c("NMDS1", "NMDS2")], 
+                    list(group = cTurf.site.scores$Treatment), mean)
+
+ggplot() + 
+
+  geom_point(data=cTurf.site.scores,aes(x=NMDS1,y=NMDS2, colour=Damselfish, shape = Month),size=12, stroke =3) + # add the point markers
+
+  geom_path(data = df_ell.cTurf.Treatment, aes(x = NMDS1, y = NMDS2, col = Damselfish, linetype = Month), size = 4)+ #this is the ellipse
+  geom_text(data = cTurf.species.scores, aes(x = NMDS1, y = NMDS2, label = species),colour = "grey25", size = 10) +
+  geom_text(aes(x = -1.3, y = 0.85, label = "Stress = 0.08\nSpecies: P < 0.001 \nMonth: P = 0.005 \nSpecies X Month: P = 0.02"), size = 13, hjust = 0) +
+  scale_colour_manual(values = c("Stegastes nigricans" = "navy",
+                                 "Stegastes punctatus" = "dodgerblue"),
+                      label = c(expression(italic("S. nigricans")),
+                               expression(italic("S. punctatus")) )) +
+  coord_equal() +
+  theme_bw() + 
+  theme(axis.title.x = element_text(size=26), 
+        axis.title.y = element_text(size=26),
+        axis.text.x = element_text(size=26), 
+        axis.text.y = element_text(size=26),
+        legend.key.width=unit(5,"cm"),
+        panel.background = element_blank(), 
+        panel.grid.major = element_blank(),  #remove major-grid labels
+        panel.grid.minor = element_blank(),  #remove minor-grid labels
+        plot.background = element_blank(),
+        legend.key.size = unit(1.5, "cm"), # increase legend size
+        legend.text = element_text(size = 34), # increase legend text
+        legend.title = element_text(size = 36),
+        legend.position = "bottom", # move legend to top left
+        legend.box = 'horizontal', # make legend horizontal
+        legend.box.background = element_rect(colour = "black")) + # add box around legend
+  guides(colour=guide_legend(title.position="top", # make color legend title go above legend
+                                     title.hjust =0.5, nrow = 2),
+         shape=guide_legend(title.position="top",  # make shape legend title go above legend
+                                     title.hjust =0.5,
+                            nrow = 2),
+         path = guide_legend(title.position="top",  # make shape legend title go above legend
+                                     title.hjust =0.5)
+         ) +
+
+  scale_shape_manual(values = c(16, 1) )
+  
+
+
+```
+
+
+```{r read in data and preliminary viz}
+comb = read.csv("/Users/noamaltman-kurosaki/iCloud Drive (Archive) - 1/Documents/Grad school (general)/PhD General/Coral-algal contact experiment/Supplemental materials for initial submission coral reefs/Data and code/Turf cover and PAM data/Coral-algal contact experiment - PAM READINGS WITH WEEK 2.csv", stringsAsFactors = T)
+comb$Colony.ID = as.factor(paste(comb$Coral.treatment, comb$Block))
+
+# remove pocillopora for v3 analyses - not used in anything fom here on out
+
+comb = subset(comb, Coral.treatment != "Pocillopora damicornis")
+
+week1 = subset(comb, Week == 1)
+
+
+acropora_1 = subset(week1, Coral.treatment == "Acropora pulchra")
+
+porites_1 = subset(week1, Coral.treatment == "Porites rus")
+
+
+```
+
+MODEL SELECTION REMOVED FROM V3. SEE V2 FOR MODEL SELECTION EXERCISE
+
+```{r week 1 stats}
+
+# Fit beta mixed model
+beta_week1mme = glmmTMB(Yield ~ Algal.treatment*Coral.treatment + (1|Colony.ID), data = week1, beta_family(link = "logit"))
+
+# check model diagnostics with DHARMa
+plot(week1_diag <- simulateResiduals(beta_week1mme))
+
+summary(beta_week1mme) # low var in random effects (std = 0.01)
+Anova(beta_week1mme) # sig algal trt effect (X2 = 88.2, P < 2E-16) and interaction (X2 = 13.5, P = 0.03), but no difference b/w coral trt (X2 = 0.13, P = 0.7)
+emmeans(beta_week1mme, pairwise ~ Coral.treatment | Algal.treatment, adjust = "bonferroni")
+# interaction driven by lower P. rus yield following 6d of contact with S. punctatus turf 
+
+
+emmeans(beta_week1mme, pairwise ~ Algal.treatment | Coral.treatment, adjust = "bonferroni")
+# A pulchra - the two turfs are different from turf mimic and Amansia.
+# Porites - two turfs lower than empty, mimics, and sarg. S punctatus lower than Amansia as well.
+
+
+
+```
+
+```{r week 1 graph}
+means = ddply(comb, c("Coral.treatment", "Algal.treatment"), numcolwise(mean), na.rm = TRUE )
+errors =  ddply(comb, c("Coral.treatment", "Algal.treatment"), numcolwise(se))
+means$SE = errors$Yield
+# means$Letters = c(acletters$Letter, pcletters$Letter, prletters$Letter)
+
+ggplot(means) +
+  geom_bar(aes(x = Algal.treatment, y = Yield), stat = "identity") +
+  geom_errorbar(aes(x = Algal.treatment, ymin = Yield - SE,
+                    ymax= Yield + SE), width=.1) +
+#  geom_text(aes(x = Algal.treatment, y = 0.6, label = Letters), size = 6) +
+  scale_x_discrete(limits = c('Empty', 'Macroalgae mimic', 'Turf mimic', 'Amansia',
+                              'Sargassum', 'S nigricans turf', 'S punctatus turf')) +
+  scale_y_continuous(limits = c(0, 0.7)) +
+  facet_wrap(~Coral.treatment, ncol = 1) +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        legend.position = "none",
+        axis.line = element_line(colour = "black"),
+        axis.text.x = element_text(color = "grey20", size = 20, hjust = .5, vjust = .5, face = "plain"),
+        axis.title.x = element_text(color = "grey20", size = 25, hjust = .5, vjust = 0, face = "plain"),
+        axis.text.y = element_text(color = "grey20", size = 20, hjust = .5, vjust = .5, face = "plain"),
+        axis.title.y = element_text(color = "grey20", size = 25, hjust = .5, vjust = 0, face = "plain"),
+        strip.text.x = element_text(color = "grey20", size = 25, hjust = .5, vjust = 0, face = "plain")
+  )
+ 
+
+```
+
+
+```{r week 2}
+
+week2 = subset(comb, Week == 2)
+
+
+acropora_2 = subset(week2, Coral.treatment == "Acropora pulchra")
+
+porites_2 = subset(week2, Coral.treatment == "Porites rus")
+
+
+beta_week2mme = glmmTMB(Yield ~ Algal.treatment*Coral.treatment + (1|Colony.ID), data = week2, beta_family(link = "logit"))
+plot(week2_diag <- simulateResiduals(beta_week2mme)) # quantile deviations detected in one curve
+summary(beta_week2mme) # low var in random effects (std = 0.04)
+Anova(beta_week2mme)
+# Algal treatment (X2 = 257, P < E-16)
+# Coral trt (X2 = 6.4, P = 0.01)
+# Int (X2 = 24.3, P = 4.6E-04)
+
+# beta.contact = emmeans(beta_week2mme, ~ Algal.treatment*Coral.treatment)
+# contrast(beta.contact, "consec", simple = "each", combine = TRUE, adjust = "bonferroni") # sig interaction driven by S punctatus turf
+
+
+
+emmeans(beta_week2mme, pairwise ~ Coral.treatment | Algal.treatment, adjust = "bonferroni")
+# P rus significantly impacted by both turfs more than A pulchra
+# S. nigricans (t = 2.9, P = 0.004), S punctatus (t = 4.5, P < 0.001)
+
+emmeans(beta_week2mme, pairwise ~ Algal.treatment | Coral.treatment, adjust = "bonferroni")
+# A pulchra - two turfs are sig lower than empty, mimics, and amansia. S punctatus is sig lower than sarg. 
+# P rus - two turfs lower than all other treatments, but not from each other. Amansia lower than empty, turf mimc. 
+
+contact_letters_2 = c('a', 'a', 'a', 'a', 'ab', 'bc', 'c', # A pulchra letters
+                    'a', 'ab', 'a', 'b', 'ab', 'c', 'c') # P rus letters
+
+
+
+
+
+```
+
+
+```{r week2 graph, fig.height = 15, fig.width=20}
+
+
+
+
+week2_graph = ddply(week2, c("Coral.treatment", "Algal.treatment"), numcolwise(mean), na.rm = TRUE )
+week2_errors =  ddply(week2, c("Coral.treatment", "Algal.treatment"), numcolwise(se))
+week2_graph$SE = week2_errors$Yield
+
+# Need to arrange dataframe so connexting letters match correctly
+treatment_order = c('Empty', 'Macroalgae mimic', 'Turf mimic', 'Amansia',
+                              'Sargassum', 'S nigricans turf', 'S punctatus turf')
+
+week2_graph = week2_graph %>% dplyr::arrange(factor(Algal.treatment, levels = treatment_order )) # arrange by algal treatment
+week2_graph = week2_graph %>% dplyr::arrange(factor(Coral.treatment, levels = c('Acropora pulchra', 'Porites rus') )) # arrange by coral
+week2_graph$Letters = contact_letters_2 # add letters
+week2_graph$Labels = c(rep("a. Acropora pulchra\n", 7), rep("b. Porites rus\n", 7))
+week2_stats = data.frame(Coral.treatment = c("Acropora pulchra", "Porites rus"), Text = c("", "Algae: P < E-16\nCoral: P = 0.01\nCoral X Algae: P = 4.6E-04")) # create dataframe so text only appears in bottom facet
+
+## VERSION 1
+ggplot(data = week2) +
+  geom_boxplot(aes(x = Algal.treatment, y = Yield, colour = Coral.treatment),
+               position = position_dodge(0.9), outlier.shape = NA, size = 1.2) +
+  scale_x_discrete(limits = treatment_order, 
+                       labels = c("Empty",
+                              "Turf mimic",
+                              "Macroalgal mimic",
+                              expression(italic("Amansia")),
+                              expression(italic("Sargassum")),
+                              expression(italic("S. nigricans")),
+                              expression(italic("S. punctatus")))) +
+  geom_point(aes(x = Algal.treatment, y = Yield, colour = Coral.treatment),
+              size = 3, position = position_jitterdodge(dodge.width = 0.9, jitter.width = 0.3)) +
+  scale_colour_manual(values=c("Acropora pulchra" = "dodgerblue",
+                               "Porites rus" = "firebrick2"),
+                      labels = c(expression(italic("Acropora pulchra")), expression(italic("Porites rus")))
+                      ) +
+  geom_text(data = week2_graph, aes(x = Algal.treatment, y = 0.7, colour = Coral.treatment, label = Letters),
+            position = position_dodge(0.9), size = 12, show.legend = FALSE) +
+ geom_text(data = week2_graph, aes(x = Algal.treatment, y = 0.72,
+                                    label = c("", "", "", "", "", "**", "***",
+                                              "", "", "", "", "", "**", "***")), # add a star for sig interaction 
+           size = 12) +
+  geom_text(aes(x = 0.7, y = 0.15, label = "Algae: P < E-16\nCoral: P = 0.01\nCoral X Algae: P = 4.6E-04"), hjust = 0, size = 12)+
+  labs(x = "", y = "Effective Quantum Yield (Y)\n", color = "Coral species") +
+  theme_classic() + 
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        legend.position = "bottom",
+        legend.key.size = unit(2, 'cm'),
+        legend.text = element_text(size=25),
+        legend.title = element_text(size=28),
+        axis.line = element_line(colour = "black"),
+        axis.text.x = element_text(color = "grey20", size = 30, hjust = .5, vjust = .5, face = "plain"),
+        axis.title.x = element_text(color = "grey20", size = 32, hjust = .5, vjust = 0, face = "plain"),
+        axis.text.y = element_text(color = "grey20", size = 30, hjust = .5, vjust = .5, face = "plain"),
+        axis.title.y = element_text(color = "grey20", size = 32, hjust = .5, vjust = 0, face = "plain"),
+        strip.text.x = element_text(color = "grey20", size = 32, hjust = .5, vjust = 0, face = "plain")
+  )
+
+
+## VERSION 2
+ggplot(data = week2) +
+  geom_boxplot(aes(x = Algal.treatment, y = Yield, colour = Coral.treatment),
+               position = position_dodge(0.9), outlier.shape = NA, size = 1.2) +
+  scale_x_discrete(limits = treatment_order, labels = c('Empty', 'Macroalgae\nmimic', 'Turf\nmimic', 'Amansia',
+                              'Sargassum', 'S nigricans\nturf', 'S punctatus\nturf')) +
+  geom_point(aes(x = Algal.treatment, y = Yield, colour = Coral.treatment),
+              size = 3, position = position_jitterdodge(dodge.width = 0.9, jitter.width = 0.3)) +
+  scale_colour_manual(values=c("Acropora pulchra" = "dodgerblue",
+                               "Porites rus" = "firebrick2") 
+                      ) +
+  geom_text(data = week2_graph, aes(x = Algal.treatment, y = 0.7, colour = Coral.treatment, label = Letters),
+            position = position_dodge(0.9), size = 8) +
+ geom_text(data = week2_graph, aes(x = Algal.treatment, y = 0.72,
+                                    label = c("", "", "", "", "", "", "",
+                                              "", "", "", "", "", "**", "***")), # add a star for sig interaction 
+           size = 12) +
+  facet_wrap(~Coral.treatment, ncol = 1, 
+             labeller = as_labeller(c(`Acropora pulchra` = "a. *A. pulchra*\n",
+                                      `Porites rus` = "b. *P. rus*\n"))) +
+  geom_text(data = week2_stats, aes(x = 0.7, y = 0.18, label = Text), hjust = 0, size = 9)+
+  theme_classic() + 
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        legend.position = "bottom",
+        legend.key.size = unit(2, 'cm'),
+        legend.text = element_text(size=20),
+        legend.title = element_text(size=20),
+        axis.line = element_line(colour = "black"),
+        axis.text.x = element_text(color = "grey20", size = 25, hjust = .5, vjust = .5, face = "plain"),
+        axis.title.x = element_text(color = "grey20", size = 28, hjust = .5, vjust = 0, face = "plain"),
+        axis.text.y = element_text(color = "grey20", size = 25, hjust = .5, vjust = .5, face = "plain"),
+        axis.title.y = element_text(color = "grey20", size = 28, hjust = .5, vjust = 0, face = "plain"),
+        strip.text.x = element_text(color = "grey20", size = 28, hjust = 0, vjust = 0, face = "plain"),
+        strip.background = element_blank(),
+        strip.text = element_markdown()
+  )
+
+```
+
+```{r surface extracts march}
+surface = read.csv("/Users/noamaltman-kurosaki/iCloud Drive (Archive) - 1/Documents/Grad school (general)/PhD General/Coral-algal contact experiment/Supplemental materials for initial submission/Data and code/Turf cover and PAM data/Coral-algal contact experiment - SURFACE EXTRACT PAM READINGS.csv")
+
+
+as = subset(surface, Coral.treatment == "Acropora pulchra")
+ps = subset(surface, Coral.treatment == "Porites rus")
+
+# with random effect
+surface_beta_mme = glmmTMB(Yield ~ Algal.treatment*Coral.treatment + (1|Colony.ID), data = surface, beta_family(link = "logit"))
+
+
+plot(surface_diag <- simulateResiduals(surface_beta_mme)) # non homogeneity of variance in residuals
+plot(residuals(surface_beta_mme) ~ predict(surface_beta_mme)) # some funnelling (reduced variance at higher predicted values)
+# NOTE: I think this is fine - it's not really a true continuous distribution since at high values yield sort of caps off
+# you would expect reduced variance in "healthy" or unimpacted corals
+
+summary(surface_beta_mme) # low variance between colonies - awesome (std = 0.07)
+Anova(surface_beta_mme) # Algal.treatment (X2 = 59.1, P = 1.4e-13; Coral.treatment X2 = 8.9, P = .003; Int X2 = 13.1, P = 0.001)
+
+emmeans(surface_beta_mme, pairwise ~ Algal.treatment | Coral.treatment, adjust = "bonferroni")
+# Acropora: both turfs sig lower than control
+# P rus: only S punctatus sig lower than control
+
+
+emmeans(surface_beta_mme, pairwise ~ Coral.treatment | Algal.treatment, adjust = "bonferroni")
+# Sig difference between corals for both turf trt
+
+surface_letters = c('a', 'b', 'b', # A pulchra letters from emmeans
+                    'a', 'ab', 'b') # P rus letters from emmeans
+
+```
+
+```{r graph surface extracts, fig.height = 16, fig.width = 20}
+surface_means = ddply(surface, c("Coral.treatment", "Algal.treatment"), numcolwise(mean), na.rm = TRUE )
+errors =  ddply(surface, c("Coral.treatment", "Algal.treatment"), numcolwise(se))
+surface_means$SE = errors$Yield
+surface_means$Letters = surface_letters
+surface_means$Coral_contrast = c("", "**", "**",
+                                 "", "**", "**") # for coral comparisons
+
+
+ggplot(data = surface) +
+  geom_boxplot(aes(x = Algal.treatment, y = Yield, colour = Coral.treatment),
+               position = position_dodge(0.9), outlier.shape = NA, size = 1.1) +
+    geom_point(data = surface, aes(x = Algal.treatment, y = Yield, colour = Coral.treatment),
+              size = 3, position = position_jitterdodge(dodge.width = 0.9, jitter.width = 0.3)) +
+  geom_text(data = surface_means, aes(x = Algal.treatment, y = 0.7, colour = Coral.treatment, label = Letters), position = position_dodge(0.9), size = 12, show.legend = FALSE) +
+  geom_text(aes(x = 0.5, y = 0.21, label = "Algae: P < 1.4E-13\nCoral: P = 0.003\nCoral X Algae: P = 0.001"), hjust = 0, size = 14)+
+  geom_text(data = surface_means, aes(x = Algal.treatment, y = 0.72, label = Coral_contrast), size = 12) +
+  scale_colour_manual(values=c("Acropora pulchra" = "dodgerblue",
+                               "Porites rus" = "firebrick2"),
+                      labels = c(expression(italic("A. pulchra")), expression(italic("P. rus")))
+                      ) +
+   scale_x_discrete(labels = c("\nControl", expression(italic("\nS. nigricans")), expression(italic("\nS. punctatus")) ) ) +
+  labs(x = "", y = "Effective Quantum Yield (Y)\n", color = "Coral species") +
+  theme_classic() + 
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        legend.position = "bottom",
+        legend.key.size = unit(2, 'cm'),
+        legend.text = element_text(size=38),
+        legend.title = element_text(size=38),
+        axis.line = element_line(colour = "black"),
+        axis.text.x = element_text(color = "grey20", size = 38, hjust = .5, vjust = .5, face = "plain"),
+        axis.title.x = element_text(color = "grey20", size = 25, hjust = .5, vjust = 0, face = "plain"),
+        axis.text.y = element_text(color = "grey20", size = 30, hjust = .5, vjust = .5, face = "plain"),
+        axis.title.y = element_text(color = "grey20", size = 38, hjust = .5, vjust = 0, face = "plain"),
+        strip.text.x = element_text(color = "grey20", size = 25, hjust = .5, vjust = 0, face = "plain")
+  )
+
+
+
+```
+
+
+```{r winter surface, fig.height=10, fig.width=10}
+winter = read.csv("/Users/noamaltman-kurosaki/iCloud Drive (Archive) - 1/Documents/Grad school (general)/PhD General/Coral-algal contact experiment/Supplemental materials for initial submission/Data and code/Turf cover and PAM data/Coral-algal contact experiment - SURFACE EXTRACT WINTER.csv", stringsAsFactors = T)
+# levels(winter$Algal.treatment)[levels(winter$Algal.treatment)=="Summer S nigricans turf"] <- "March S nigricans turf"
+
+bwplot(Yield ~ Algal.treatment | Coral.treatment, data = winter,
+       par.settings = list(box.dot = list(col = "black", cex=2),
+                           box.umbrella = list(col = "black"),
+                           box.rectangle = list(col = "black"),
+                           plot.symbol   = list(cex = 2, col = 1)))
+hist(winter$Yield)
+
+as_winter = subset(winter, Coral.treatment == "Acropora pulchra")
+ps_winter = subset(winter, Coral.treatment == "Porites rus")
+
+
+
+
+```
+
+```{r winter betareg, fig.height = 16, fig.width = 20}
+
+# with random effect
+beta_mme = glmmTMB(Yield ~ Algal.treatment*Coral.treatment + (1|Colony.ID), data = winter, beta_family(link = "logit"))
+plot(winter_diag <- simulateResiduals(beta_mme)) # no problems detected in model
+Anova(beta_mme) # Difference in yield between corals (X2 = 8.1, P < 0.004), but not between algal treatments (X2 = 6.1, P = 0.2) or interaction (X2 = 5.6, P = 0.2)
+
+summary(beta_mme) # some variance between colonies (std = 0.09)
+
+
+emmeans(beta_mme, pairwise ~ Algal.treatment | Coral.treatment) # no sig differences
+letters_winter = c('a', 'a', 'a', 'a', 'a',
+                         'a', 'a', 'a', 'a', 'a')
+
+
+
+
+means = ddply(winter, c("Coral.treatment", "Algal.treatment"), numcolwise(mean), na.rm = TRUE )
+errors =  ddply(winter, c("Coral.treatment", "Algal.treatment"), numcolwise(se))
+means$SE = errors$Yield
+means$Letters = letters_winter
+
+# FACET WRAP GRAPH REMOVED FROM V3. SEE V2
+
+## PLOT
+
+ggplot(data = winter) +
+  geom_boxplot(aes(x = Algal.treatment, y = Yield, colour = Coral.treatment),
+               position = position_dodge(0.9), outlier.shape = NA, size = 1.1) +
+  geom_point(data = winter, aes(x = Algal.treatment, y = Yield, colour = Coral.treatment),
+              size = 3, position = position_jitterdodge(dodge.width = 0.9, jitter.width = 0.3)) +
+
+  geom_text(aes(x = 0.5, y = 0.23, label = "Algae: P = 0.2\nCoral: P = 0.004\nCoral X Algae: P = 0.2"), hjust = 0, size = 14)+
+  scale_y_continuous(limits = c(0.2,0.71)) +
+  scale_x_discrete(labels = c("Control", 
+                              "March\nS. nigricans\nturf extract",
+                              "March\nS. punctatus\nturf extract",
+                              "September\nS. nigricans\nturf extract",
+                              "September\nS. punctatus\nturf extract")) +
+  scale_colour_manual(values=c("Acropora pulchra" = "dodgerblue",
+                               "Porites rus" = "firebrick2"),
+                      label = c(expression(italic("Acropora pulchra")), expression(italic("Porites rus")))
+                      ) +
+  labs(x = "", y = "Effective Quantum Yield (Y)\n", color = "Coral species") +
+  theme_classic() + 
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        legend.position = "bottom",
+        legend.key.size = unit(2, 'cm'),
+        legend.text = element_text(size=20),
+        legend.title = element_text(size=20),
+        axis.line = element_line(colour = "black"),
+        axis.text.x = element_text(color = "grey20", size = 28, hjust = .5, vjust = .5, face = "plain"),
+        axis.title.x = element_text(color = "grey20", size = 28, hjust = .5, vjust = 0, face = "plain"),
+        axis.text.y = element_text(color = "grey20", size = 25, hjust = .5, vjust = .5, face = "plain"),
+        axis.title.y = element_text(color = "grey20", size = 28, hjust = .5, vjust = 0, face = "plain"),
+        strip.text.x = element_text(color = "grey20", size = 28, hjust = .5, vjust = 0, face = "plain")
+  )
+
+
+```
+
+
+
+
+```{r ratios, fig.height = 10, fig.width = 15}
+# create factor to compare relative yield between seasons
+surface$Season = as.factor(rep("Summer", nrow(surface)))
+winter$Season = as.factor(rep("Winter", nrow(winter)))
+comb_surface = rbind(surface, winter)
+comb_surface$Coral.treatment = as.factor(comb_surface$Coral.treatment) # coerce treatments into factors
+comb_surface$Algal.treatment = as.factor(comb_surface$Algal.treatment)
+comb_surface$Ratio = comb_surface$Yield/comb_surface$Colony.ID.control.yield # ratio of yield relative to control for that colony ID
+comb_surface$Pct.change = (comb_surface$Yield - comb_surface$Colony.ID.control.yield)/comb_surface$Colony.ID.control.yield*100
+
+
+
+
+
+comb_surface_ratio = subset(comb_surface, Algal.treatment != "Control") # remove control trt all should be == 1) 
+range(subset(comb_surface_ratio, Coral.treatment == "Acropora pulchra" & Algal.treatment == "S punctatus turf")$Pct.change)
+hist(comb_surface$Ratio) # symmetrical
+shapiro.test(comb_surface$Ratio) # but not normal
+
+bwplot(Ratio ~ Algal.treatment | Coral.treatment, data = comb_surface_ratio,
+       par.settings = list(box.dot = list(col = "black", cex=2),
+                           box.umbrella = list(col = "black"),
+                           box.rectangle = list(col = "black"),
+                           plot.symbol   = list(cex = 2, col = 1)))
+
+ap_ratio = subset(comb_surface_ratio, Coral.treatment == "Acropora pulchra")
+pr_ratio = subset(comb_surface_ratio, Coral.treatment == "Porites rus")
+
+ratiolmer = lmer(Ratio ~ Coral.treatment*Algal.treatment + (1|Colony.ID), data = comb_surface_ratio)
+Anova(ratiolmer) # difference between coral trt and algal trt
+
+
+ratiomod = glm(Ratio ~ Coral.treatment*Algal.treatment, data = comb_surface_ratio)
+summary(ratiomod)
+
+plot(residuals(ratiomod)) # looks good to me...
+qqPlot(residuals(ratiomod)) # looks solid
+Anova(ratiomod) # no sig interaction between treatments, but sig difference between algal trt and between coral trt
+# (P rus has higher yield than A pulchra)
+plot(allEffects(ratiomod))
+
+
+# add random effects for colony ID
+ratiolmer2 = lmer(Ratio ~ Coral.treatment*Algal.treatment + (1|Colony.ID), data = comb_surface_ratio)
+plot(ratio_diag <- simulateResiduals(ratiolmer2)) # non homogenous variance of residuals
+plot(residuals(ratiolmer2) ~ predict(ratiolmer2)) # some heteroskedasticity but not bad - will use permutation test
+summary(ratiolmer2) # variance of random effects (0.08)
+r.squaredGLMM(ratiolmer2) # 0.31, 0.46
+permanova.lmer(ratiolmer2) # no sig coral trt, yes sig algal trt (F(3, 66) = 12.9, P = 0.001), no sig interaction
+
+# Type I Analysis of Variance Table with Satterthwaite's method
+#                                  Sum Sq  Mean Sq NumDF DenDF F value  Pr(>F) Perm.p
+# Coral.treatment                 0.19074 0.190738     1    22   7.408 0.01245  0.116
+# Algal.treatment                 1.45892 0.291784     5   110  11.332 0.00000  0.001
+# Coral.treatment:Algal.treatment 0.09732 0.019465     5   110   0.756 0.58346  0.569
+
+x = emmeans(ratiolmer2, pairwise ~ Algal.treatment | Coral.treatment)
+
+model_means_cld <- cld(object = x,
+                       adjust = "Tukey",
+                       Letters = letters,
+                       alpha = 0.05)
+# no difference between the different kinds of turf within the same season for either coral species
+# A pulchra: S nigricans turf lower than SP Sept but not SN sept, S punctatus different from both sept (ab, a, bc, c)
+# P rus: Only a sig difference between S punctatus seasons. (a, a, ab, b)
+
+
+# GRAPHING 
+
+ratio_means = ddply(comb_surface_ratio, c("Coral.treatment", "Algal.treatment"), numcolwise(mean), na.rm = TRUE )
+ratio_errors =  ddply(comb_surface_ratio, c("Coral.treatment", "Algal.treatment"), numcolwise(se))
+ratio_means$SE = ratio_errors$Ratio
+ratio_means$Letters = model_means_cld$.group # results from emmeans
+
+
+ggplot(data = comb_surface_ratio ) +
+  geom_boxplot(aes(x = Algal.treatment, y = Ratio, colour = Season), outlier.shape = NA, size = 1.2) +
+  geom_jitter(data = comb_surface_ratio, aes(x = Algal.treatment, y = Ratio, colour = Season), width = 0.1, size = 3) +
+  geom_hline(yintercept = 1, linetype = "dashed")+
+  facet_wrap(~Coral.treatment, ncol = 1) +
+  geom_text(data = ratio_means, aes(x = Algal.treatment, y = 2.2, label = Letters), size = 8) +
+  scale_x_discrete( limits = c("S nigricans turf", "Summer S nigricans turf", "Winter S nigricans turf", "S punctatus turf",
+                              "Summer S punctatus turf", "Winter S punctatus turf"),
+    labels = c("S nigricans turf", "March\nS nigricans turf", "September\nS nigricans turf", "S punctatus turf",
+                              "March\nS punctatus turf", "September\nS punctatus turf")) +
+  scale_colour_manual(values=c("Winter" = "dodgerblue",
+                               "Summer" = "firebrick2") 
+                      )+
+  theme_classic() + 
+  labs(y = "Relative Effective Quantum Yield\n") +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        legend.position = "bottom",
+        legend.key.size = unit(2, 'cm'),
+        legend.text = element_text(size=20),
+        legend.title = element_text(size=20),
+        axis.line = element_line(colour = "black"),
+        axis.text.x = element_text(color = "grey20", size = 20, hjust = .5, vjust = .5, face = "plain"),
+        axis.title.x = element_text(color = "grey20", size = 25, hjust = .5, vjust = 0, face = "plain"),
+        axis.text.y = element_text(color = "grey20", size = 20, hjust = .5, vjust = .5, face = "plain"),
+        axis.title.y = element_text(color = "grey20", size = 25, hjust = .5, vjust = 0, face = "plain"),
+        strip.text.x = element_text(color = "grey20", size = 25, hjust = .5, vjust = 0, face = "plain")
+  )
+
+```
+
+```{r temperature}
+temp = read.csv("/Users/noamaltman-kurosaki/iCloud Drive (Archive) - 1/Documents/Grad school (general)/PhD General/Coral-algal contact experiment/MCR_LTER01_BottomMountThermistors_20230323.csv")
+str(temp)
+temp$time_local = as.POSIXct(temp$time_local, format="%Y-%m-%d %H:%M:%S")
+
+lastyear = temp[temp$time_local >= "2022-01-01" & temp$time_local <= "2022-12-31", ]
+lastyear = subset(lastyear, "reef_type_code" = "FRI")
+
+summertemp = temp[temp$time_local >= "2022-03-01" & temp$time_local <= "2022-03-28", ]
+summertemp = subset(summertemp, "reef_type_code" = "FRI")
+wintertemp = temp[temp$time_local >= "2022-09-08" & temp$time_local <= "2022-09-11", ]
+wintertemp = subset(wintertemp, "reef_type_code" = "FRI")
+ggplot() +
+  geom_line(data = lastyear, aes(x = time_local, y = temperature_c)) +
+  geom_line(data = summertemp, aes(x = time_local, y = temperature_c), colour = "red") +
+  geom_line(data = wintertemp, aes(x = time_local, y = temperature_c), colour = "blue") +
+  theme_classic() + 
+  labs(y = "Temp (C) \n", x = "Date") +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        legend.position = "bottom",
+        legend.key.size = unit(2, 'cm'),
+        legend.text = element_text(size=20),
+        legend.title = element_text(size=20),
+        axis.line = element_line(colour = "black"),
+        axis.text.x = element_text(color = "grey20", size = 20, hjust = .5, vjust = .5, face = "plain"),
+        axis.title.x = element_text(color = "grey20", size = 25, hjust = .5, vjust = 0, face = "plain"),
+        axis.text.y = element_text(color = "grey20", size = 20, hjust = .5, vjust = .5, face = "plain"),
+        axis.title.y = element_text(color = "grey20", size = 25, hjust = .5, vjust = 0, face = "plain"),
+        strip.text.x = element_text(color = "grey20", size = 25, hjust = .5, vjust = 0, face = "plain")
+  )
+
+temp_graph = data.frame("Season" = as.factor(c("March", "September") ),
+                        "Temp" = c(mean(summertemp$temperature_c), mean(wintertemp$temperature_c)),
+                        "SE" = c(se(summertemp$temperature_c), se(wintertemp$temperature_c)))
+ggplot(data = temp_graph) +
+  geom_point(aes(x = Season, y = Temp, colour = Season)) +
+  geom_errorbar(aes(x = Season, ymin = Temp - SE, ymax = Temp + SE, colour = Season), width = 0.3) +
+  scale_colour_manual(values = c("March" = "red", "September" = "blue")) +
+  theme_classic() + 
+  labs(y = "Temp (C) \n", x = "Field season") +
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        legend.position = "bottom",
+        legend.key.size = unit(2, 'cm'),
+        legend.text = element_text(size=20),
+        legend.title = element_text(size=20),
+        axis.line = element_line(colour = "black"),
+        axis.text.x = element_text(color = "grey20", size = 20, hjust = .5, vjust = .5, face = "plain"),
+        axis.title.x = element_text(color = "grey20", size = 25, hjust = .5, vjust = 0, face = "plain"),
+        axis.text.y = element_text(color = "grey20", size = 20, hjust = .5, vjust = .5, face = "plain"),
+        axis.title.y = element_text(color = "grey20", size = 25, hjust = .5, vjust = 0, face = "plain"),
+        strip.text.x = element_text(color = "grey20", size = 25, hjust = .5, vjust = 0, face = "plain")
+  )
+```
+
+
+```
