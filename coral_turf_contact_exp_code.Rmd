@@ -32,6 +32,7 @@ library(tibble)
 library(ggrepel)
 library(rcompanion)
 library(emmeans)
+library(multcomp)
 library(betareg)
 library(glmmTMB)
 library(DHARMa)
@@ -808,37 +809,41 @@ acropora_adiv %>%
 
 
 # mixed gamma reg
-acropora_gamma <- glmer(Shannon ~ Algal.trt  + (1| Coral.colony.ID) , data = acropora_adiv,
+acropora_gamma <- glmmTMB(Shannon ~ Algal.trt  + (1| Coral.colony.ID) , data = acropora_adiv,
                        family = Gamma(link = "log") )
 summary(acropora_gamma)
-Anova(acropora_gamma) # X2 = 38.2 P = 1.0e-06
+Anova(acropora_gamma) # X2 = 35.6 P = 3.339e-06
 plot(residuals(acropora_gamma) ~ predict(acropora_gamma)) # looks good
+hist(residuals(acropora_gamma))
+# some skew in residuals driven by skew in data
+# this seems likely to be real and natural variation in the data (treatment effects)
+# otherwise model diags look great - continuing here
 plot(allEffects(acropora_gamma))
-acropora_gamma_comp = emmeans(acropora_gamma, pairwise ~ Algal.trt)
+acropora_gamma_comp <- emmeans(acropora_gamma, pairwise ~ Algal.trt)
 acropora_gamma_letters <- cld(object = acropora_gamma_comp,
                       adjust = "Tukey",
                       Letters = letters,
                       alpha = 0.05)
 
 # poisson richness
-acropora_poisson = glmer(Observed ~ Algal.trt  + (1| Coral.colony.ID) , data = acropora_adiv,
-                       family = poisson(link = "log") )
+acropora_poisson <- glmmTMB(Observed ~ Algal.trt  + (1| Coral.colony.ID) , data = acropora_adiv,
+                       family = poisson )
 summary(acropora_poisson)
 plot(residuals(acropora_poisson) ~ predict(acropora_poisson)) # highly heteroskedastic
 hist(residuals(acropora_poisson)) 
-acropora_poisson_comp = emmeans(acropora_poisson, pairwise ~ Algal.trt)
+acropora_poisson_comp <- emmeans(acropora_poisson, pairwise ~ Algal.trt)
 acropora_poisson_letters <- cld(object = acropora_poisson_comp,
                       adjust = "Tukey",
                       Letters = letters,
                       alpha = 0.05)
 
 # nb richness
-acropora_nb = glmer.nb(Observed ~ Algal.trt  + (1| Coral.colony.ID) , data = acropora_adiv ) 
+acropora_nb <- glmmTMB(Observed ~ Algal.trt  + (1| Coral.colony.ID) , family = nbinom2, data = acropora_adiv ) 
 summary(acropora_nb)
-Anova(acropora_nb) # X2= 41.5, P = 2.3e-07
-plot(residuals(acropora_nb) ~ predict(acropora_nb)) # way better
-hist(residuals(acropora_nb)) # better
-acropora_nb_comp = emmeans(acropora_poisson, pairwise ~ Algal.trt)
+Anova(acropora_nb) # X2 = 41.407  df = 6  P = 2.408e-07
+plot(residuals(acropora_nb) ~ predict(acropora_nb)) 
+hist(residuals(acropora_nb)) # still some issues but on the whole much better and addresses overdispersion brought on from skew
+acropora_nb_comp <- emmeans(acropora_poisson, pairwise ~ Algal.trt)
 acropora_nb_letters <- cld(object = acropora_nb_comp,
                       adjust = "Tukey",
                       Letters = letters,
@@ -846,7 +851,7 @@ acropora_nb_letters <- cld(object = acropora_nb_comp,
 ```
 
 
-### Plot - figure 5 alpha diversity  acropora
+### Plot - figure 5ce alpha diversity  acropora
 ```{r acropora shannon and observed plot, fig.height = 15, fig.width=18}
 (acropora_observed_ggplot <- 
   acropora_adiv %>%
@@ -918,13 +923,10 @@ acropora_nb_letters <- cld(object = acropora_nb_comp,
         axis.text.x = element_text(color = "grey20", size = 28, angle = 70, vjust = 1, hjust=1, face = "plain")))
 ```
 
-
+### Porites
 
 ```{r porites alpha diversity}
 
-# Subsample reads
-# (porites_rare <- phyloseq::rarefy_even_depth(porites, rngseed = 123, replace = FALSE))
-# head(phyloseq::sample_sums(porites_rare))
 
 #Generate a data.frame with alpha div measures
 porites_adiv <- data.frame(
@@ -935,7 +937,7 @@ porites_adiv <- data.frame(
 head(porites_adiv)
 
 
-# check normality
+# vizualize
 hist(porites_adiv$Observed) # not as skewed as acropora but still not great. more uniform
 
 plot_richness(porites, measures = c("Observed", "Shannon", "InvSimpson"))
@@ -992,23 +994,25 @@ porites_adiv %>%
 
 
 # mixed gamma reg
-porites_gamma = glmer(Shannon ~ Algal.trt  + (1| Coral.colony.ID) , data = porites_adiv,
+porites_gamma <- glmmTMB(Shannon ~ Algal.trt  + (1| Coral.colony.ID) , data = porites_adiv,
                        family = Gamma(link = "log") )
 summary(porites_gamma)
-Anova(porites_gamma) # X2 = 15.8  P = 0.02
+Anova(porites_gamma) # X2 = 14.3  P = 0.03
 plot(residuals(porites_gamma) ~ predict(porites_gamma))
-plot(allEffects(porites_gamma))
-porites_gamma_comp = emmeans(porites_gamma, pairwise ~ Algal.trt)
+hist(residuals(porites_gamma)) # looks ok - maybe a little lumpy but not bad
+qqnorm(residuals(porites_gamma))
+qqline(residuals(porites_gamma))
+porites_gamma_comp <- emmeans(porites_gamma, pairwise ~ Algal.trt)
 porites_gamma_letters <- cld(object = porites_gamma_comp,
                       adjust = "Tukey",
                       Letters = letters,
                       alpha = 0.05)
 
 # porites poisson
-porites_poisson = glmer(Observed ~ Algal.trt  + (1| Coral.colony.ID) , data = porites_adiv,
-                       family = poisson(link = "log") )
+porites_poisson <- glmmTMB(Observed ~ Algal.trt  + (1| Coral.colony.ID) , data = porites_adiv,
+                       family = poisson )
 summary(porites_poisson)
-Anova(porites_poisson) # X2 = 796.3  P < 2.2e-16
+Anova(porites_poisson) # X2 = 796.2  P < 2.2e-16
 plot(residuals(porites_poisson) ~ predict(porites_poisson))
 hist(residuals(porites_poisson)) # looks ok
 porites_poisson_comp = emmeans(porites_poisson, pairwise ~ Algal.trt)
@@ -1018,10 +1022,13 @@ porites_poisson_letters <- cld(object = porites_poisson_comp,
                       alpha = 0.05)
 
 
+
+
 ```
 
+### Plot figure 5df
 ```{r porites shannon and richness plot, fig.height = 15, fig.width=18}
-(porites_observed_ggplot = 
+(porites_observed_ggplot <- 
   porites_adiv %>%
   gather(key = metric, value = value, c("Observed")) %>%
   mutate(metric = factor(metric, levels = c("Observed"))) %>%
@@ -1085,35 +1092,22 @@ porites_poisson_letters <- cld(object = porites_poisson_comp,
 ```
 
 ```{r alpha diversity panel graph, fig.height = 18, fig.width=18}
-# mylegend = g_legend(acropora_observed_ggplot)
-# layout = rbind(c(1, 1, 2, 2),
-#                c(1, 1, 2, 2),
-#                c(3, 3, 4, 4),
-#                c(3, 3, 4, 4),
-#                c(5, 5, 5, 5))
-# 
-# grid.arrange(acropora_observed_ggplot + theme(legend.position = "none"), 
-#              acropora_adiv_ggplot+ theme(legend.position = "none"), 
-#              porites_observed_ggplot+ theme(legend.position = "none"), 
-#              porites_adiv_ggplot+ theme(legend.position = "none"),
-#              mylegend, layout_matrix = layout
-#              )
-# 
+
 
 ggarrange(acropora_observed_ggplot + theme(axis.text.x=element_blank()), acropora_adiv_ggplot + theme(axis.text.x=element_blank()),
           porites_observed_ggplot, porites_adiv_ggplot, ncol=2, nrow=2, heights = c(1,1.5), widths = c(1,1),
           common.legend = TRUE, legend="bottom") 
-# why is there so much empty space now but I can't make it look right without the height = 45??
-# Remember to crop in preview if regenerating figs... so dumb. 
+# creates lots of empty space
+# crop in photoshop
 
 ```
 
 
-
+### Figure S3 - binary jaccard
 
 
 ```{r acropora jaccard, fig.height=10, fig.width=10}
-acropora_binary = microbiome::transform(acropora, "pa")  # convert acropora to binary presence absence following qiime method
+acropora_binary <- microbiome::transform(acropora, "pa")  # convert acropora to binary presence absence following qiime method
 acropora_jaccard_matrix <- phyloseq::distance(acropora_binary, method = "jaccard") 
 
 
@@ -1121,14 +1115,14 @@ anosim(acropora_jaccard_matrix, phyloseq::sample_data(acropora_binary)$Algal.trt
 adonis2(acropora_jaccard_matrix ~ phyloseq::sample_data(acropora_binary)$Algal.trt) # R2 = 0.1, F = 1.4, P < 0.001
 
 
-acropora_jaccard = ordinate(acropora_binary, distance = "jaccard", method = "PCoA")
+acropora_jaccard <- ordinate(acropora_binary, distance = "jaccard", method = "PCoA")
 acropora_jaccard1 <- acropora_jaccard$values$Eigenvalues[1] / sum(acropora_jaccard$values$Eigenvalues)
 acropora_jaccard2 <- acropora_jaccard$values$Eigenvalues[2]  / sum(acropora_jaccard$values$Eigenvalues)
 
 
 
 # Check to see if ordination matches qiime emperor output
-(acropora_jaccard_plot = plot_ordination(acropora_binary, acropora_jaccard, type = "samples", color = "Algal.trt")  + 
+(acropora_jaccard_plot <- plot_ordination(acropora_binary, acropora_jaccard, type = "samples", color = "Algal.trt")  + 
   theme_bw() +
   labs(title = "a. *A. pulchra* Jaccard\n") +
   geom_text(aes(x = -0.55, y = -0.36, label = "PERMANOVA\nR = 0.1, P < 0.001"), size = 6, hjust = 0, colour = 'black') +
@@ -1219,7 +1213,7 @@ vegan::permutest(acropora_dispr) # F = 0.6, P = 0.7
 ```
 
 ```{r porites jaccard, fig.height=10, fig.width=10}
-porites_binary = microbiome::transform(porites, "pa")  # convert porites to binary presence absence following qiime method
+porites_binary <- microbiome::transform(porites, "pa")  # convert porites to binary presence absence following qiime method
 porites_jaccard_matrix <- phyloseq::distance(porites_binary, method = "jaccard") 
 
 
@@ -1227,7 +1221,7 @@ anosim(porites_jaccard_matrix, phyloseq::sample_data(porites_binary)$Algal.trt) 
 adonis2(porites_jaccard_matrix ~ phyloseq::sample_data(porites_binary)$Algal.trt) # R2 = 0.11, F = 1.5, P < 0.001
 
 
-porites_jaccard = ordinate(porites_binary, distance = "jaccard", method = "PCoA")
+porites_jaccard <- ordinate(porites_binary, distance = "jaccard", method = "PCoA")
 porites_jaccard1 <- porites_jaccard$values$Eigenvalues[1] / sum(porites_jaccard$values$Eigenvalues)
 porites_jaccard2 <- porites_jaccard$values$Eigenvalues[2]  / sum(porites_jaccard$values$Eigenvalues)
 
@@ -1323,7 +1317,7 @@ vegan::permutest(porites_dispr) # F = 0.7, P = 0.7
 (mod.HSD <- TukeyHSD(porites_dispr)) # no sig differences
 
 ```
-
+### Figure 5ab - bray curtis ordination
 
 ```{r acropora bray curtis}
 
@@ -1331,18 +1325,9 @@ vegan::permutest(porites_dispr) # F = 0.7, P = 0.7
 # https://forum.qiime2.org/t/transformations-prior-to-diversity-plug-in-distance-calculations/17709/11
 # hellinger/sqrt transformation on relative abundance data appropriate with large number of taxa and high variance in relative abundances
 # https://stats.stackexchange.com/questions/394572/what-is-the-most-appropriate-transformation-method-for-performing-analyses-on-sp
-acropora_sqrt = microbiome::transform(acropora_rel_abund, "hellinger") 
+acropora_sqrt <- microbiome::transform(acropora_rel_abund, "hellinger") 
 
 acropora_bray_matrix <- phyloseq::distance(acropora_sqrt, method = "bray") 
-# acropora_bray_matrix_qiime = read_qza("/Users/noamaltman-kurosaki/iCloud Drive (Archive) - 1/Documents/Grad school (general)/PhD General/Coral-algal contact experiment/Corrected_files_for_real/acropora_core_metrics_results_final/bray_curtis_distance_matrix.qza")$data
-# weighted = list(acropora_bray_matrix, acropora_bray_matrix_qiime) 
-# compare_dists(weighted) # confirmed that qiime just uses untransoformed relative abundance for bray curtis
-
-# replace "-" in rownames from qiime with "." for parity
-# names(acropora_bray_matrix_qiime) = gsub("-", ".", names(acropora_bray_matrix_qiime)) 
-
-# names(acropora_bray_matrix_qiime) = names(acropora_bray_matrix)
-
 
 anosim(acropora_bray_matrix, phyloseq::sample_data(acropora_sqrt)$Algal.trt) # R = 0.11, P = 0.001
 adonis2(acropora_bray_matrix ~ phyloseq::sample_data(acropora_sqrt)$Algal.trt) # R2 = 0.13, F = 2.1, P = 0.001
@@ -1367,7 +1352,7 @@ for(i in 1:ncol(cbn)){ # for each possible comparison
 acropora.bray.p.adj <- p.adjust(acropora.bray.p, method = "bonferroni") # adjust the p value for multiple comparisons
 acropora.bray.p.table <- as.data.frame(cbind.data.frame(t(cbn), p=acropora.bray.p, p.adj=acropora.bray.p.adj)) # create data table containing p value comparisons 
 # SN sig different from amansia, empty, TM. SP sig different from empty, TM
-# write.csv(acropora.bray.p.table, "/Users/noamaltman-kurosaki/iCloud Drive (Archive) - 1/Documents/Grad school (general)/PhD General/Coral-algal contact experiment/acropora pairwise anosim bray sqrt transformed.csv")
+# write to csv for table s3
 
 acropora.adonis.p <- c() # Create vector for outputting P values
 
@@ -1383,15 +1368,15 @@ for(i in 1:ncol(cbn)){ # for each possible comparison
 
 acropora.adonis.p.adj <- p.adjust(acropora.adonis.p, method = "bonferroni") # adjust the p value for multiple comparisons
 acropora.adonis.p.table <- as.data.frame(cbind.data.frame(t(cbn), p=acropora.adonis.p, p.adj=acropora.adonis.p.adj)) # create data table containing p value comparisons
-# write.csv(acropora.bray.p.table, "/Users/noamaltman-kurosaki/iCloud Drive (Archive) - 1/Documents/Grad school (general)/PhD General/Coral-algal contact experiment/acropora pairwise adonis bray sqrt transformed.csv")
+# write to csv for table s3
 
 
 
-acropora_bray = ordinate(acropora_sqrt, distance = "bray", method = "PCoA")
+acropora_bray <- ordinate(acropora_sqrt, distance = "bray", method = "PCoA")
 
 
 
-(acropora_bray_plot = plot_ordination(physeq = acropora, ordination = acropora_bray, type = "samples", color = "Algal.trt")  + 
+(acropora_bray_plot <- plot_ordination(physeq = acropora, ordination = acropora_bray, type = "samples", color = "Algal.trt")  + 
   theme_bw() +
   labs(title = "a. *A. pulchra* Bray-Curtis\n", color = "Algal treatment") +
   geom_point(size = 4) +
@@ -1445,11 +1430,8 @@ vegan::permutest(acropora_dispr) # F = 1.8, P = 0.1
 
 ```{r porites bray curtis}
 
-# qiime does not transform data prior to calculating bray-curtis dissimlarity matrix
-# https://forum.qiime2.org/t/transformations-prior-to-diversity-plug-in-distance-calculations/17709/11
-# hellinger/sqrt transformation on relative abundance data appropriate with large number of taxa and high variance in relative abundances
-# https://stats.stackexchange.com/questions/394572/what-is-the-most-appropriate-transformation-method-for-performing-analyses-on-sp
-porites_sqrt = microbiome::transform(porites_rel_abund, "hellinger") 
+# repeat for porites
+porites_sqrt <- microbiome::transform(porites_rel_abund, "hellinger") 
 
 porites_bray_matrix <- phyloseq::distance(porites_sqrt, method = "bray") 
 
@@ -1476,7 +1458,7 @@ for(i in 1:ncol(cbn)){ # for each possible comparison
 porites.bray.p.adj <- p.adjust(porites.bray.p, method = "bonferroni") # adjust the p value for multiple comparisons
 porites.bray.p.table <- as.data.frame(cbind.data.frame(t(cbn), p=porites.bray.p, p.adj=porites.bray.p.adj)) # create data table containing p value comparisons 
 # SN sig different from amansia, empty, TM. SP sig different from empty and TM. Sarg also different from empty
-# write.csv(porites.bray.p.table, "/Users/noamaltman-kurosaki/iCloud Drive (Archive) - 1/Documents/Grad school (general)/PhD General/Coral-algal contact experiment/porites pairwise anosim bray sqrt transformed.csv")
+# write to csv for table s3
 
 
 porites.adonis.p <- c() # Create vector for outputting P values
@@ -1493,17 +1475,14 @@ for(i in 1:ncol(cbn)){ # for each possible comparison
 
 porites.adonis.p.adj <- p.adjust(porites.adonis.p, method = "bonferroni") # adjust the p value for multiple comparisons
 porites.adonis.p.table <- as.data.frame(cbind.data.frame(t(cbn), p=porites.adonis.p, p.adj=porites.adonis.p.adj)) # create data table containing p value comparisons
-# write.csv(porites.bray.p.table, "/Users/noamaltman-kurosaki/iCloud Drive (Archive) - 1/Documents/Grad school (general)/PhD General/Coral-algal contact experiment/porites pairwise adonis bray sqrt transformed.csv")
+# write to csv for Table S3
 
-porites_bray = ordinate(porites_sqrt, distance = "bray", method = "PCoA")
-
-# porites_sqrt1 <- porites_bray$values$Eigenvalues[1] / sum(porites_bray$values$Eigenvalues)
-# porites_sqrt2 <- porites_bray$values$Eigenvalues[2]  / sum(porites_bray$values$Eigenvalues)
+porites_bray <- ordinate(porites_sqrt, distance = "bray", method = "PCoA")
 
 
 
 
-(porites_bray_plot = plot_ordination(physeq = porites, ordination = porites_bray, type = "samples", color = "Algal.trt")  + 
+(porites_bray_plot <- plot_ordination(physeq = porites, ordination = porites_bray, type = "samples", color = "Algal.trt")  + 
   theme_bw() +
   labs(title = "b. *P. rus* Bray-Curtis\n", color = "Algal treatment") +
   geom_text(aes(x = 0.93, y = 0.55, label = "PERMANOVA\nR2 = 0.13, P = 0.001"), hjust = 1, size = 10, colour = 'black')+
@@ -1554,6 +1533,7 @@ vegan::permutest(porites_dispr) # F = 0.8, P = 0.6
 
 ```
 
+### Plot - compile figure 5 panels
 ```{r microbial diversity panel graph, fig.height= 30, fig.width=20}
 ggarrange(acropora_bray_plot, 
           porites_bray_plot, 
@@ -1567,6 +1547,8 @@ ggarrange(acropora_bray_plot,
 
 ```
 
+### Figure S3 - Panel graph
+
 ```{r jaccard diversity panel graph, fig.height=10, fig.width=20}
 ggarrange(acropora_jaccard_plot, 
           porites_jaccard_plot, ncol=2, nrow=1, widths = c(1,1), common.legend = TRUE,
@@ -1575,12 +1557,12 @@ ggarrange(acropora_jaccard_plot,
 
 
 
-
+## Figure S4 - DeSeq Heatmap
 
 ```{r acropora deseq summary matrix}
-acropora_deseq_summary = read.csv("/Users/noamaltman-kurosaki/iCloud Drive (Archive) - 1/Documents/Grad school (general)/PhD General/Coral-algal contact experiment/Acropora deseq summary matrix v1.csv", row.names = 1)
-acropora_deseq_summary = as.matrix(acropora_deseq_summary)
-colnames(acropora_deseq_summary) = rownames(acropora_deseq_summary)
+acropora_deseq_summary <- read.csv(here::here("data", "acropora_deseq_summary_matrix.csv"), row.names = 1)
+acropora_deseq_summary <- as.matrix(acropora_deseq_summary)
+colnames(acropora_deseq_summary) <- rownames(acropora_deseq_summary)
 melted_acropora_deseq <- melt(acropora_deseq_summary, na.rm = TRUE)
 
 melted_acropora_deseq <- melted_acropora_deseq %>%
@@ -1588,7 +1570,7 @@ melted_acropora_deseq <- melted_acropora_deseq %>%
 
 # Heatmap
 
-(acropora_heatmap = ggplot(data = melted_acropora_deseq, aes(Var2, Var1, fill = value))+
+(acropora_heatmap <- ggplot(data = melted_acropora_deseq, aes(Var2, Var1, fill = value))+
  geom_tile(color = "white")+
  geom_text(aes(Var2, Var1, label = value), color = "black", size = 8) +
  scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
@@ -1622,9 +1604,9 @@ theme(
 ```
 
 ```{r porites deseq summary matrix}
-porites_deseq_summary = read.csv("/Users/noamaltman-kurosaki/iCloud Drive (Archive) - 1/Documents/Grad school (general)/PhD General/Coral-algal contact experiment/porites deseq summary matrix v1.csv", row.names = 1)
-porites_deseq_summary = as.matrix(porites_deseq_summary)
-colnames(porites_deseq_summary) = rownames(porites_deseq_summary)
+porites_deseq_summary <- read.csv(here::here("data", "porites_deseq_summary_matrix.csv"), row.names = 1)
+porites_deseq_summary <- as.matrix(porites_deseq_summary)
+colnames(porites_deseq_summary) <- rownames(porites_deseq_summary)
 melted_porites_deseq <- melt(porites_deseq_summary, na.rm = TRUE)
 
 melted_porites_deseq <- melted_porites_deseq %>%
@@ -1632,7 +1614,7 @@ melted_porites_deseq <- melted_porites_deseq %>%
 
 # Heatmap
 
-(porites_heatmap = ggplot(data = melted_porites_deseq, aes(Var2, Var1, fill = value))+
+(porites_heatmap <- ggplot(data = melted_porites_deseq, aes(Var2, Var1, fill = value))+
  geom_tile(color = "white")+
  geom_text(aes(Var2, Var1, label = value), color = "black", size = 8) +
  scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
@@ -1664,7 +1646,7 @@ theme(
 
 
 ```
-
+### plot Figure S4 panel graph
 ```{r heatmap panel, fig.height = 22, fig.width= 10}
 
 grid.arrange(arrangeGrob(acropora_heatmap , porites_heatmap, nrow = 2)
@@ -1673,9 +1655,9 @@ grid.arrange(arrangeGrob(acropora_heatmap , porites_heatmap, nrow = 2)
 ggarrange(acropora_heatmap, porites_heatmap, ncol=1, nrow=2, heights = c(1,1)) 
 ```
 
-
+### Broad summary info from DeSeq for results and discussion
 ```{r deseq summary stats}
-acropora_deseq = read.csv("/Users/noamaltman-kurosaki/iCloud Drive (Archive) - 1/Documents/Grad school (general)/PhD General/Coral-algal contact experiment/Acropora just genus deseq.csv", stringsAsFactors = T)
+acropora_deseq <- read.csv(here::here("data", "acropora_just_genus_deseq.csv"), stringsAsFactors = T)
 
 length(levels(acropora_deseq$Genus)) # number of unique genera = 26
 
@@ -1684,7 +1666,7 @@ length(levels(droplevels(acropora_deseq[grep("Sulf", acropora_deseq$Genus), ])$G
 # total of unique genera that involve sulfur cycling = 4 + hypnocyclus = 5
 
 
-porites_deseq = read.csv("/Users/noamaltman-kurosaki/iCloud Drive (Archive) - 1/Documents/Grad school (general)/PhD General/Coral-algal contact experiment/Porites just genus deseq.csv", stringsAsFactors = T)
+porites_deseq <- read.csv(here::here("data", "porites_just_genus_deseq.csv"), stringsAsFactors = T)
 length(levels(porites_deseq$Genus)) # number of unique genera = 97
 length(levels(droplevels(porites_deseq[grep("sulf", porites_deseq$Genus), ])$Genus)) # number of genera that contain "sulf" = 10
 length(levels(droplevels(porites_deseq[grep("Sulf", porites_deseq$Genus), ])$Genus)) # number of genera that START with "SULF" = 2
@@ -1694,183 +1676,3 @@ length(levels(droplevels(porites_deseq[grep("Sulf", porites_deseq$Genus), ])$Gen
 ```
 
 
-
----------------------
-
-```{r acropora unifrac rbiom}
-
-acropora_unifrac_matrix = rbiom::unifrac(acropora@otu_table, weighted=TRUE, tree=acropora@phy_tree)
-acropora_unifrac_matrix_qiime = read_qza("/Users/noamaltman-kurosaki/iCloud Drive (Archive) - 1/Documents/Grad school (general)/PhD General/Coral-algal contact experiment/Corrected_files_for_real/acropora_core_metrics_results_final/weighted_unifrac_distance_matrix.qza")$data
-weighted = list(acropora_unifrac_matrix, acropora_unifrac_matrix_qiime) 
-compare_dists(weighted) # there are the same matrix
-
-# replace "-" in rownames from qiime with "." for parity
-names(acropora_unifrac_matrix_qiime) = gsub("-", ".", names(acropora_unifrac_matrix_qiime)) 
-
-names(acropora_unifrac_matrix_qiime) = names(acropora_unifrac_matrix)
-
-acropora_unifrac = pcoa(acropora_unifrac_matrix)
-acropora_unifrac_qiime = pcoa(acropora_unifrac_matrix_qiime)
-# acropora_unifrac_qiime$values
-# Scree plot
-phyloseq::plot_scree(acropora_unifrac) + 
-  geom_bar(stat="identity", fill = "blue") +
-  labs(x = "\nAxis", y = "Proportion of Variance\n")
-
-
-plot_ordination(acropora, acropora_unifrac, type = "samples", color = "Algal.trt")  + 
-  theme_bw() +
-  labs(title = "Acropora unifrac\n") +
-  geom_point(size = 2) +
-#  coord_fixed(acropora_unifrac2 / acropora_unifrac1) +
-  scale_color_manual(values = c(Empty = "grey",
-               `Turf mimic` = "black",
-               `Macroalgae mimic` = "green",
-               Amansia = "red",
-               Sargassum = "brown",
-               `S nigricans` = "blue",
-               `S punctatus` = "skyblue") ) +
-  theme(panel.background = element_blank(), 
-        panel.grid.major = element_blank(),  #remove major-grid labels
-        panel.grid.minor = element_blank(),  #remove minor-grid labels
-        plot.background = element_blank()) # +
-#  stat_ellipse(aes(group = Algal.trt), linetype = 2)
-# 27 and 33% on qiime vs 40.6 and 36.2 here
-
-plot_ordination(acropora, acropora_unifrac_qiime, type = "samples", color = "Algal.trt")  + 
-  theme_bw() +
-  labs(title = "Acropora unifrac\n") +
-  geom_point(size = 2) +
-#  coord_fixed(acropora_unifrac2 / acropora_unifrac1) +
-  scale_color_manual(values = c(Empty = "grey",
-               `Turf mimic` = "black",
-               `Macroalgae mimic` = "green",
-               Amansia = "red",
-               Sargassum = "brown",
-               `S nigricans` = "blue",
-               `S punctatus` = "skyblue") ) +
-  theme(panel.background = element_blank(), 
-        panel.grid.major = element_blank(),  #remove major-grid labels
-        panel.grid.minor = element_blank(),  #remove minor-grid labels
-        plot.background = element_blank()) # +
-#  stat_ellipse(aes(group = Algal.trt), linetype = 2)
-
-anosim(acropora_unifrac_matrix, phyloseq::sample_data(acropora)$Algal.trt) # R = 0.065, P = 0.004
-
-# PAIRWISE COMPARISONS FOR ANOSIM (https://www.yanh.org/2021/01/01/microbiome-r/)
-
-cbn <- combn(x=unique(phyloseq::sample_data(acropora)$Algal.trt), m = 2) # Create dataframe specifying possible comparisons
-
-
-acropora.unifrac.p <- c() # Create vector for outputting P values
-
-for(i in 1:ncol(cbn)){ # for each possible comparison
-  ps.subs <- subset_samples(acropora, Algal.trt %in% cbn[,i]) # subset the data in the trt for that comparison
-  metadata_sub <- data.frame(sample_data(ps.subs)) # specify the metadata for that subset
-  
-  permanova_pairwise <- anosim(rbiom::unifrac(ps.subs@otu_table, weighted=TRUE, tree=ps.subs@phy_tree),
-                               metadata_sub$Algal.trt) # perform anosim for the data based on those two treatments
-  acropora.unifrac.p <- c(acropora.unifrac.p, permanova_pairwise$signif[1]) # append the p value for that comparison to the created p value dataframe
-}
-
-acropora.unifrac.p.adj <- p.adjust(acropora.unifrac.p, method = "bonferroni") # adjust the p value for multiple comparisons
-acropora.unifrac.p.table <- as.data.frame(cbind.data.frame(t(cbn), p=acropora.unifrac.p, p.adj=acropora.unifrac.p.adj)) # create data table containing p value comparisons 
-# NO SIG RESULTS
-# write.csv(acropora.unifrac.p.table, "/Users/noamaltman-kurosaki/iCloud Drive (Archive) - 1/Documents/Grad school (general)/PhD General/Coral-algal contact experiment/acropora pairwise anosim unifrac rbiom.csv")
-
-
-#Dispersion test
-acropora_dispr <- vegan::betadisper(acropora_unifrac_matrix, phyloseq::sample_data(acropora)$Algal.trt)
-acropora_dispr # 
-
-# plot of dispersion test
-plot(acropora_dispr, main = "Ordination Centroids and Dispersion Labeled: Aitchison Distance", sub = "")
-boxplot(acropora_dispr, main = "", xlab = "") # turf trts generally furthest from centroid
-vegan::permutest(acropora_dispr) # F = 0.6, P = 0.75
-
-
-
-
-## Tukey's Honest Significant Differences
-(mod.HSD <- TukeyHSD(acropora_dispr)) # no sig differences
-
-
-
-
-```
-
-
-```{r porites unifrac rbiom}
-# issues with unifrac if using phyloseq
-# See: https://github.com/joey711/phyloseq/issues/956
-# Using rbiom package for calculating unifrac distances instead
-
-porites_unifrac_matrix = rbiom::unifrac(porites@otu_table, weighted=TRUE, tree=porites@phy_tree)
-porites_unifrac = pcoa(porites_unifrac_matrix)
-
-# Scree plot
-phyloseq::plot_scree(porites_unifrac) + 
-  geom_bar(stat="identity", fill = "blue") +
-  labs(x = "\nAxis", y = "Proportion of Variance\n")
-
-
-plot_ordination(porites, porites_unifrac, type = "samples", color = "Algal.trt")  + 
-  theme_bw() +
-  labs(title = "porites unifrac\n") +
-  geom_point(size = 2) +
-#  coord_fixed(porites_unifrac2 / porites_unifrac1) +
-  scale_color_manual(values = c(Empty = "grey",
-               `Turf mimic` = "black",
-               `Macroalgae mimic` = "green",
-               Amansia = "red",
-               Sargassum = "brown",
-               `S nigricans` = "blue",
-               `S punctatus` = "skyblue") ) +
-  theme(panel.background = element_blank(), 
-        panel.grid.major = element_blank(),  #remove major-grid labels
-        panel.grid.minor = element_blank(),  #remove minor-grid labels
-        plot.background = element_blank()) 
-# 28.6 and 12.9 on qiime vs 29.3 and 13.3 on qiime
-
-anosim(porites_unifrac_matrix, phyloseq::sample_data(porites)$Algal.trt) # R = 0.13, P = 0.001
-
-# PAIRWISE COMPARISONS FOR ANOSIM (https://www.yanh.org/2021/01/01/microbiome-r/)
-
-cbn <- combn(x=unique(phyloseq::sample_data(porites)$Algal.trt), m = 2) # Create dataframe specifying possible comparisons
-
-
-porites.unifrac.p <- c() # Create vector for outputting P values
-
-for(i in 1:ncol(cbn)){ # for each possible comparison
-  ps.subs <- subset_samples(porites, Algal.trt %in% cbn[,i]) # subset the data in the trt for that comparison
-  metadata_sub <- data.frame(sample_data(ps.subs)) # specify the metadata for that subset
-  
-  permanova_pairwise <- anosim(rbiom::unifrac(ps.subs@otu_table, weighted=TRUE, tree=ps.subs@phy_tree),
-                               metadata_sub$Algal.trt) # perform anosim for the data based on those two treatments
-  porites.unifrac.p <- c(porites.unifrac.p, permanova_pairwise$signif[1]) # append the p value for that comparison to the created p value dataframe
-}
-
-porites.unifrac.p.adj <- p.adjust(porites.unifrac.p, method = "bonferroni") # adjust the p value for multiple comparisons
-porites.unifrac.p.table <- as.data.frame(cbind.data.frame(t(cbn), p=porites.unifrac.p, p.adj=porites.unifrac.p.adj)) # create data table containing p value comparisons
-# SN, SP, and Sarg all different from empty. SP also different from TM
-# write.csv(porites.unifrac.p.table, "/Users/noamaltman-kurosaki/iCloud Drive (Archive) - 1/Documents/Grad school (general)/PhD General/Coral-algal contact experiment/porites pairwise anosim unifrac rbiom.csv")
-
-
-
-#Dispersion test
-porites_dispr <- vegan::betadisper(porites_bray_matrix, phyloseq::sample_data(porites)$Algal.trt)
-porites_dispr # 
-
-# plot of dispersion test
-plot(porites_dispr, main = "Ordination Centroids and Dispersion Labeled: Aitchison Distance", sub = "")
-boxplot(porites_dispr, main = "", xlab = "") # turf trts generally furthest from centroid
-vegan::permutest(porites_dispr) # F = .8, P = 0.5
-
-
-
-
-## Tukey's Honest Significant Differences
-(mod.HSD <- TukeyHSD(porites_dispr)) # no sig differences
-
-
-```
