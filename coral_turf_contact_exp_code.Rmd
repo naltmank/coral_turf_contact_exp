@@ -287,12 +287,7 @@ comb <- read.csv(here::here("data", "coral_algal_contact_data.csv"), stringsAsFa
 comb$Colony.ID <- as.factor(paste(comb$Coral.treatment, comb$Block)) # add colony ID factor for random effect
 
 
-week1 <- subset(comb, Week == 1) # subset initial week 1 data
 
-# subset based on species
-acropora_1 <- subset(week1, Coral.treatment == "Acropora pulchra")
-
-porites_1 <- subset(week1, Coral.treatment == "Porites rus")
 
 
 ```
@@ -300,7 +295,7 @@ porites_1 <- subset(week1, Coral.treatment == "Porites rus")
 ## week 1 statistics - not used in final MS
 
 ```{r week 1 stats}
-
+week1 <- subset(comb, Week == 1) # subset initial week 1 data
 # Fit beta mixed model
 beta_week1mme <- glmmTMB(Yield ~ Algal.treatment*Coral.treatment + (1|Colony.ID), data = week1, beta_family(link = "logit"))
 
@@ -328,12 +323,6 @@ emmeans(beta_week1mme, pairwise ~ Algal.treatment | Coral.treatment, adjust = "b
 
 week2 <- subset(comb, Week == 2)
 
-
-acropora_2 <- subset(week2, Coral.treatment == "Acropora pulchra")
-
-porites_2 <- subset(week2, Coral.treatment == "Porites rus")
-
-
 beta_week2mme <- glmmTMB(Yield ~ Algal.treatment*Coral.treatment + (1|Colony.ID), data = week2, beta_family(link = "logit"))
 plot(week2_diag <- simulateResiduals(beta_week2mme)) 
 summary(beta_week2mme) # low var in random effects (std = 0.04)
@@ -341,7 +330,8 @@ Anova(beta_week2mme)
 # Algal treatment (X2 = 257, P < E-16)
 # Coral trt (X2 = 6.4, P = 0.01)
 # Int (X2 = 24.3, P = 4.6E-04)
-
+r.squaredGLMM(beta_week2mme) # 0.86, 0.87
+emmeans(beta_week2mme, ~ Coral.treatment | Algal.treatment, type = "response")
 # within factor pairwise comparisons - differences between how algae affects corals
 emmeans(beta_week2mme, pairwise ~ Coral.treatment | Algal.treatment, adjust = "bonferroni")
 # P rus significantly impacted by both turfs more than A pulchra
@@ -476,7 +466,8 @@ surface <- read.csv(here::here("data", "turf_extract_pam_data_march.csv")) # rea
 surface_beta_mme <- glmmTMB(Yield ~ Algal.treatment*Coral.treatment + (1|Colony.ID), data = surface, beta_family(link = "logit"))
 
 
-plot(surface_diag <- simulateResiduals(surface_beta_mme)) # non homogeneity of variance in residuals - likely driven by treatments?
+plot(surface_diag <- simulateResiduals(surface_beta_mme)) # non homogeneity of variance in residuals - likely driven by treatments
+# Moving on
 # EXAMINE FURTHER
 plot(residuals(surface_beta_mme) ~ predict(surface_beta_mme)) # some funnelling (reduced variance at higher predicted values)
 # NOTE: I think this is fine - it's not really a true continuous distribution since at high values yield sort of caps off
@@ -484,10 +475,10 @@ plot(residuals(surface_beta_mme) ~ predict(surface_beta_mme)) # some funnelling 
 
 summary(surface_beta_mme) # low variance between colonies - awesome (std = 0.07)
 Anova(surface_beta_mme) # Algal.treatment (X2 = 59.1, P = 1.4e-13; Coral.treatment X2 = 8.9, P = .003; Int X2 = 13.1, P = 0.001)
-
+r.squaredGLMM(surface_beta_mme) # 0.75, 0.82
 
 # within-factor pairwise comparisons - differences between treatments for each coral
-emmeans(surface_beta_mme, pairwise ~ Algal.treatment | Coral.treatment, adjust = "bonferroni")
+emmeans(surface_beta_mme, pairwise ~ Algal.treatment | Coral.treatment, adjust = "bonferroni", type = "response")
 # Acropora: both turfs sig lower than control
 # P rus: only S punctatus sig lower than control
 
@@ -563,11 +554,11 @@ bwplot(Yield ~ Algal.treatment | Coral.treatment, data = winter,
 beta_mme <- glmmTMB(Yield ~ Algal.treatment*Coral.treatment + (1|Colony.ID), data = winter, beta_family(link = "logit"))
 plot(winter_diag <- simulateResiduals(beta_mme)) # no problems detected in model
 Anova(beta_mme) # Difference in yield between corals (X2 = 8.1, P < 0.004), but not between algal treatments (X2 = 6.1, P = 0.2) or interaction (X2 = 5.6, P = 0.2)
-
+r.squaredGLMM(beta_mme) # 0.36, 0.57
 summary(beta_mme) # some variance at colony level (std = 0.09)
 
 
-emmeans(beta_mme, pairwise ~ Algal.treatment | Coral.treatment) # no sig differences
+emmeans(beta_mme, pairwise ~ Algal.treatment | Coral.treatment, type = "response") # no sig differences
 letters_winter = c('a', 'a', 'a', 'a', 'a',
                          'a', 'a', 'a', 'a', 'a')
 
@@ -588,7 +579,6 @@ ggplot(data = winter) +
                position = position_dodge(0.9), outlier.shape = NA, size = 1.1) +
   geom_point(data = winter, aes(x = Algal.treatment, y = Yield, colour = Coral.treatment),
               size = 3, position = position_jitterdodge(dodge.width = 0.9, jitter.width = 0.3)) +
-
   geom_text(aes(x = 0.5, y = 0.23, label = "Algae: P = 0.2\nCoral: P = 0.004\nCoral X Algae: P = 0.2"), hjust = 0, size = 14)+
   scale_y_continuous(limits = c(0.2,0.71)) +
   scale_x_discrete(labels = c("Control", 
@@ -1226,7 +1216,7 @@ porites_jaccard1 <- porites_jaccard$values$Eigenvalues[1] / sum(porites_jaccard$
 porites_jaccard2 <- porites_jaccard$values$Eigenvalues[2]  / sum(porites_jaccard$values$Eigenvalues)
 
 # Check to see if ordination matches qiime emperor output
-(porites_jaccard_plot = plot_ordination(porites_binary, porites_jaccard, type = "samples", color = "Algal.trt")  + 
+(porites_jaccard_plot <- plot_ordination(porites_binary, porites_jaccard, type = "samples", color = "Algal.trt")  + 
     geom_point(size = 4) +
     geom_text(aes(x = 0.8, y = 0.45, label = "PERMANOVA\nR = 0.11, P < 0.001"), colour = "black", hjust = 1, size = 6) +
   theme_bw() +
@@ -1319,7 +1309,7 @@ vegan::permutest(porites_dispr) # F = 0.7, P = 0.7
 ```
 ### Figure 5ab - bray curtis ordination
 
-```{r acropora bray curtis}
+```{r acropora bray curtis, fig.height=10, fig.width=10}
 
 # qiime does not transform data prior to calculating bray-curtis dissimlarity matrix
 # https://forum.qiime2.org/t/transformations-prior-to-diversity-plug-in-distance-calculations/17709/11
@@ -1376,11 +1366,14 @@ acropora_bray <- ordinate(acropora_sqrt, distance = "bray", method = "PCoA")
 
 
 
+
+# Plot ----
 (acropora_bray_plot <- plot_ordination(physeq = acropora, ordination = acropora_bray, type = "samples", color = "Algal.trt")  + 
   theme_bw() +
   labs(title = "a. *A. pulchra* Bray-Curtis\n", color = "Algal treatment") +
   geom_point(size = 4) +
   geom_text(aes(x = -0.8, y = 0.5, label = "PERMANOVA\nR2 = 0.13, P = 0.001"), colour = 'black', hjust = 0, size = 10) + 
+
 #  coord_fixed() +
   scale_color_manual(values = c(Empty = "grey",
                `Turf mimic` = "black",
@@ -1663,16 +1656,150 @@ length(levels(acropora_deseq$Genus)) # number of unique genera = 26
 
 length(levels(droplevels(acropora_deseq[grep("sulf", acropora_deseq$Genus), ])$Genus)) # number of genera that contain "sulf" = 4
 length(levels(droplevels(acropora_deseq[grep("Sulf", acropora_deseq$Genus), ])$Genus)) # number of genera that START with "SULF" = 0
-# total of unique genera that involve sulfur cycling = 4 + hypnocyclus = 5
+# total of unique genera that involve sulfur cycling = 4 + Hypnocyclicus = 5
 
 
 porites_deseq <- read.csv(here::here("data", "porites_just_genus_deseq.csv"), stringsAsFactors = T)
 length(levels(porites_deseq$Genus)) # number of unique genera = 97
 length(levels(droplevels(porites_deseq[grep("sulf", porites_deseq$Genus), ])$Genus)) # number of genera that contain "sulf" = 10
 length(levels(droplevels(porites_deseq[grep("Sulf", porites_deseq$Genus), ])$Genus)) # number of genera that START with "SULF" = 2
-# Total genera that involve sulfur cycling = 12 + hypnocyclus = 13
+# Total genera that involve sulfur cycling = 12 + Hypnocyclicus = 13
 
 
 ```
 
+# Revision 2 amended plots
 
+## Figure 5
+
+### Acropora Bray-curtis
+
+```{r acropora bray curtis plot with vectors, fig.height = 10, fig.width=10}
+# For Revision 2 - add relevant species scores vectors to PCoA ----
+
+# vector of relevant species scores: Endozoicomonas, Vibrio, and the significant sulfur cyclers
+acropora_important_genera <-
+  c("Endozoicomonas", "Vibrio", "Hypnocyclicus", "Carboxylicivirga",
+    levels(droplevels(acropora_deseq[grep("sulf", acropora_deseq$Genus), ])$Genus))
+
+# Extract scores
+acropora_scores <- acropora_bray$vectors[, 1:2]
+
+# extract genera data
+acropora_genus_table <- tax_glom(acropora_rel_abund, taxrank = "Genus")
+
+acropora_genera_data <- as.data.frame(t(otu_table(acropora_genus_table))) 
+
+acropora_taxa_names <- as.data.frame(tax_table(acropora_genus_table))$Genus  # Extract Genus names
+colnames(acropora_genera_data) <- acropora_taxa_names  # Replace otus as columns with Genus names
+
+acropora_genera_data_subset <- acropora_genera_data[,colnames(acropora_genera_data) %in% acropora_important_genera ]
+
+# Fit mean centroids for genera of interest
+acropora_bray_fit <- envfit(acropora_scores, acropora_genera_data_subset, perm = 999)
+
+# extract vectors
+acropora_genus_vectors <- scores(acropora_bray_fit, display = "vectors")
+
+# convert to dataframe
+acropora_genus_df <- data.frame(Genus = rownames(acropora_genus_vectors),
+                       PCoA1 = acropora_genus_vectors[, 1], 
+                       PCoA2 = acropora_genus_vectors[, 2])
+
+(acropora_bray_plot_2 <-
+  acropora_bray_plot + 
+  geom_segment(data = acropora_genus_df, aes(x = 0, y = 0, xend = PCoA1, yend = PCoA2),
+                 arrow = arrow(length = unit(0.2, "cm")), color = "black") +
+  geom_text(data = acropora_genus_df, aes(x = PCoA1, y = PCoA2, label = Genus), 
+            size = 4, color = "black", vjust = -0.5))
+
+
+```
+
+```{r porites updated bray, fig.height = 10, fig.width=10}
+porites_important_genera <-
+  c("Endozoicomonas", "Vibrio", "Hypnocyclicus", "Carboxylicivirga",
+    levels(droplevels(porites_deseq[grep("sulf", porites_deseq$Genus), ])$Genus),
+                      levels(droplevels(porites_deseq[grep("Sulf", porites_deseq$Genus), ])$Genus))
+
+# Extract scores
+porites_scores <- porites_bray$vectors[, 1:2]
+
+# extract genera data
+porites_genus_table <- tax_glom(porites_rel_abund, taxrank = "Genus")
+
+porites_genera_data <- as.data.frame(t(otu_table(porites_genus_table))) 
+
+porites_taxa_names <- as.data.frame(tax_table(porites_genus_table))$Genus  # Extract Genus names
+colnames(porites_genera_data) <- porites_taxa_names  # Replace otus as columns with Genus names
+
+porites_genera_data_subset <- porites_genera_data[,colnames(porites_genera_data) %in% porites_important_genera ]
+
+# Fit mean centroids for genera of interest
+porites_bray_fit <- envfit(porites_scores, porites_genera_data_subset, perm = 999)
+
+# extract vectors
+porites_genus_vectors <- scores(porites_bray_fit, display = "vectors")
+
+# convert to dataframe
+porites_genus_df <- data.frame(Genus = rownames(porites_genus_vectors),
+                       PCoA1 = porites_genus_vectors[, 1], 
+                       PCoA2 = porites_genus_vectors[, 2])
+
+(porites_bray_plot_2 <-
+  porites_bray_plot + 
+  geom_segment(data = porites_genus_df, aes(x = 0, y = 0, xend = PCoA1, yend = PCoA2),
+                 arrow = arrow(length = unit(0.2, "cm")), color = "black") +
+  geom_text(data = porites_genus_df, aes(x = PCoA1, y = PCoA2, label = Genus), 
+            size = 4, color = "black", vjust = -0.5))
+
+```
+# R2 more detail on taxa
+```{r get summary stats for taxa of interest}
+
+acropora_genera_data_subset$Algal.trt <- acropora_adiv$Algal.trt # add treatment
+
+
+long_acropora_data <- acropora_genera_data_subset %>%
+  pivot_longer(cols = -Algal.trt,  # Keep "Treatment" column intact, pivot everything else
+               names_to = "Genus", 
+               values_to = "Abundance")
+
+acropora_genus_summary <- long_acropora_data %>%
+  group_by(Genus, Algal.trt) %>%
+  summarise(
+    Mean = mean(Abundance, na.rm = TRUE),  # Mean relative abundance
+    SE = sd(Abundance, na.rm = TRUE) / sqrt(n()),  # Standard error
+    Max =  max(Abundance, na.rm = TRUE),
+    Min = min(Abundance, na.rm = TRUE),
+    Present = sum(Abundance != 0)/length(Abundance),
+    .groups = "drop"  # Remove unnecessary grouping
+  )
+
+
+porites_genera_data_subset$Algal.trt <- porites_adiv$Algal.trt # add treatment
+
+
+long_porites_data <- porites_genera_data_subset %>%
+  pivot_longer(cols = -Algal.trt,  # Keep "Treatment" column intact, pivot everything else
+               names_to = "Genus", 
+               values_to = "Abundance")
+
+porites_genus_summary <- long_porites_data %>%
+  group_by(Genus, Algal.trt) %>%
+  summarise(
+    Mean = mean(Abundance, na.rm = TRUE),  # Mean relative abundance
+    SE = sd(Abundance, na.rm = TRUE) / sqrt(n()),  # Standard error
+    Max =  max(Abundance, na.rm = TRUE),
+    Min = min(Abundance, na.rm = TRUE),
+    .groups = "drop"  # Remove unnecessary grouping
+  )
+```
+
+# New Figure S4 - class level viz
+```{r stacked bar chart}
+acropora_class <- read.csv(here::here("data", "acropora_class_level.csv"))
+porites_class <- read.csv(here::here("data", "porites_class_level.csv"))
+
+colnames(porites_class)[which(colnames(porites_class) %in% colnames(acropora_class))]
+```
