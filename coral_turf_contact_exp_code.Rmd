@@ -240,7 +240,7 @@ ggplot() +
   geom_text_repel(data = cTurf.species.scores, aes(x = NMDS1, y = NMDS2, label = species),colour = "grey25", size = 10) +
   
   # add stats
-  geom_text(aes(x = -1.3, y = 0.85, label = "Stress = 0.08\nSpecies: P < 0.001 \nMonth: P = 0.005 \nSpecies X Month: P = 0.02"), size = 13, hjust = 0) +
+  geom_text(aes(x = -1.3, y = 0.85, label = "Stress = 0.08\nSpecies: P < 0.01 \nMonth: P < 0.01 \nSpecies X Month: P = 0.02"), size = 13, hjust = 0) +
   geom_hline(yintercept = 0, linetype = 2, alpha = 0.3) +
   geom_vline(xintercept = 0, linetype = 2, alpha = 0.3) +
   scale_colour_manual(values = c("Stegastes nigricans" = "navy",
@@ -397,7 +397,7 @@ ggplot(data = week2) +
                                     label = c("", "", "", "", "", "**", "***",
                                               "", "", "", "", "", "**", "***")), # add a star for sig interaction 
            size = 12) +
-  geom_text(aes(x = 0.7, y = 0.15, label = "Algae: P < E-16\nCoral: P = 0.01\nCoral X Algae: P = 4.6E-04"), hjust = 0, size = 12)+
+  geom_text(aes(x = 0.7, y = 0.15, label = "Algae: P < 0.01\nCoral: P = 0.01\nCoral X Algae: P < 0.01"), hjust = 0, size = 12)+
   labs(x = "", y = "Effective Quantum Yield (Y)\n", color = "Coral species") +
   theme_classic() + 
   theme(panel.grid.major = element_blank(), 
@@ -1383,7 +1383,7 @@ acropora_bray <- ordinate(acropora_sqrt, distance = "bray", method = "PCoA")
                `S nigricans` = "blue",
                `S punctatus` = "skyblue"),
                breaks = c("Empty", "Turf mimic", "Macroalgae mimic", "Amansia", "Sargassum", "S nigricans", "S punctatus"),
-               labels = c("Empty", "Turf mimic", "Macroalgal mimic", expression(italic("Amansia")), expression(italic("Sargassum")),
+               labels = c("Zip-tie", "Turf mimic", "Macroalgal mimic", expression(italic("Amansia")), expression(italic("Sargassum")),
                           expression(italic("S. nigricans")), expression(italic("S. punctatus" )) ) 
                ) +
   theme(panel.background = element_blank(), 
@@ -1489,7 +1489,7 @@ porites_bray <- ordinate(porites_sqrt, distance = "bray", method = "PCoA")
                `S nigricans` = "blue",
                `S punctatus` = "skyblue"),
                breaks = c("Empty", "Turf mimic", "Macroalgae mimic", "Amansia", "Sargassum", "S nigricans", "S punctatus"),
-               labels = c("Empty", "Turf mimic", "Macroalgal mimic", expression(italic("Amansia")), expression(italic("Sargassum")),
+               labels = c("Zip-tie", "Turf mimic", "Macroalgal mimic", expression(italic("Amansia")), expression(italic("Sargassum")),
                           expression(italic("S. nigricans")), expression(italic("S. punctatus" )) ) 
                ) +
   theme(panel.background = element_blank(), 
@@ -1540,7 +1540,7 @@ ggarrange(acropora_bray_plot,
 
 ```
 
-### Figure S3 - Panel graph
+### Figure S4 - Panel graph
 
 ```{r jaccard diversity panel graph, fig.height=10, fig.width=20}
 ggarrange(acropora_jaccard_plot, 
@@ -1550,7 +1550,7 @@ ggarrange(acropora_jaccard_plot,
 
 
 
-## Figure S4 - DeSeq Heatmap
+## Figure S5 - DeSeq Heatmap
 
 ```{r acropora deseq summary matrix}
 acropora_deseq_summary <- read.csv(here::here("data", "acropora_deseq_summary_matrix.csv"), row.names = 1)
@@ -1710,8 +1710,9 @@ acropora_genus_df <- data.frame(Genus = rownames(acropora_genus_vectors),
   acropora_bray_plot + 
   geom_segment(data = acropora_genus_df, aes(x = 0, y = 0, xend = PCoA1, yend = PCoA2),
                  arrow = arrow(length = unit(0.2, "cm")), color = "black") +
-  geom_text(data = acropora_genus_df, aes(x = PCoA1, y = PCoA2, label = Genus), 
-            size = 4, color = "black", vjust = -0.5))
+  geom_text_repel(data = acropora_genus_df, aes(x = PCoA1, y = PCoA2, label = Genus), 
+            size = 6, color = "black", vjust = -0.5)) 
+
 
 
 ```
@@ -1750,10 +1751,24 @@ porites_genus_df <- data.frame(Genus = rownames(porites_genus_vectors),
   porites_bray_plot + 
   geom_segment(data = porites_genus_df, aes(x = 0, y = 0, xend = PCoA1, yend = PCoA2),
                  arrow = arrow(length = unit(0.2, "cm")), color = "black") +
-  geom_text(data = porites_genus_df, aes(x = PCoA1, y = PCoA2, label = Genus), 
-            size = 4, color = "black", vjust = -0.5))
+  geom_text_repel(data = porites_genus_df, aes(x = PCoA1, y = PCoA2, label = Genus), 
+            size = 6, color = "black", vjust = -0.5))
 
 ```
+### Plot Figure 5 R2
+```{r microbial diversity panel graph R2, fig.height= 30, fig.width=20}
+ggarrange(acropora_bray_plot_2, 
+          porites_bray_plot_2, 
+          acropora_observed_ggplot + theme(axis.text.x=element_blank()),
+          porites_observed_ggplot + theme(axis.text.x=element_blank()),
+          acropora_adiv_ggplot,
+          porites_adiv_ggplot,
+          ncol=2, nrow=3, heights = c(1,1,1), widths = c(1,1), common.legend = TRUE,
+          legend="top", legend.grob = get_legend(acropora_bray_plot)) 
+
+
+```
+
 # R2 more detail on taxa
 ```{r get summary stats for taxa of interest}
 
@@ -1796,10 +1811,216 @@ porites_genus_summary <- long_porites_data %>%
   )
 ```
 
-# New Figure S4 - class level viz
-```{r stacked bar chart}
-acropora_class <- read.csv(here::here("data", "acropora_class_level.csv"))
-porites_class <- read.csv(here::here("data", "porites_class_level.csv"))
+# New Figure 25 - Binary Jaccard with species vectors
 
-colnames(porites_class)[which(colnames(porites_class) %in% colnames(acropora_class))]
+```{r jaccard with vectors}
+# Extract scores
+acropora_jaccard_scores <- acropora_jaccard$vectors[, 1:2]
+
+# extract genera data
+acropora_jaccard_genus_table <- tax_glom(acropora_binary, taxrank = "Genus")
+
+acropora_jaccard_genera_data <- as.data.frame(t(otu_table(acropora_jaccard_genus_table))) 
+
+acropora_jaccard_taxa_names <- as.data.frame(tax_table(acropora_jaccard_genus_table))$Genus  # Extract Genus names
+colnames(acropora_jaccard_genera_data) <- acropora_jaccard_taxa_names  # Replace otus as columns with Genus names
+
+acropora_jaccard_genera_data_subset <- acropora_jaccard_genera_data[,colnames(acropora_jaccard_genera_data) 
+                                                                    %in% acropora_important_genera ]
+
+# Fit mean centroids for genera of interest
+acropora_jaccard_fit <- envfit(acropora_jaccard_scores, acropora_genera_data_subset, perm = 999)
+
+# extract vectors
+acropora_jaccard_genus_vectors <- scores(acropora_jaccard_fit, display = "vectors")
+
+# convert to dataframe
+acropora_jaccard_genus_df <- data.frame(Genus = rownames(acropora_jaccard_genus_vectors),
+                       PCoA1 = acropora_genus_vectors[, 1], 
+                       PCoA2 = acropora_genus_vectors[, 2])
+
+(acropora_jaccard_plot_2 <-
+  acropora_jaccard_plot + 
+  geom_segment(data = acropora_jaccard_genus_df, aes(x = 0, y = 0, xend = PCoA1, yend = PCoA2),
+                 arrow = arrow(length = unit(0.2, "cm")), color = "black") +
+  geom_text_repel(data = acropora_jaccard_genus_df, aes(x = PCoA1, y = PCoA2, label = Genus), 
+            size = 6, color = "black", vjust = -0.5)) 
+
+# Repeat with porites ----
+porites_jaccard_scores <- porites_jaccard$vectors[, 1:2]
+
+# extract genera data
+porites_jaccard_genus_table <- tax_glom(porites_binary, taxrank = "Genus")
+
+porites_jaccard_genera_data <- as.data.frame(t(otu_table(porites_jaccard_genus_table))) 
+
+porites_jaccard_taxa_names <- as.data.frame(tax_table(porites_jaccard_genus_table))$Genus  # Extract Genus names
+colnames(porites_jaccard_genera_data) <- porites_jaccard_taxa_names  # Replace otus as columns with Genus names
+
+porites_jaccard_genera_data_subset <- porites_jaccard_genera_data[,colnames(porites_jaccard_genera_data) 
+                                                                    %in% porites_important_genera ]
+
+# Fit mean centroids for genera of interest
+porites_jaccard_fit <- envfit(porites_jaccard_scores, porites_genera_data_subset, perm = 999)
+
+# extract vectors
+porites_jaccard_genus_vectors <- scores(porites_jaccard_fit, display = "vectors")
+
+# convert to dataframe
+porites_jaccard_genus_df <- data.frame(Genus = rownames(porites_jaccard_genus_vectors),
+                       PCoA1 = porites_genus_vectors[, 1], 
+                       PCoA2 = porites_genus_vectors[, 2])
+
+(porites_jaccard_plot_2 <-
+  porites_jaccard_plot + 
+  geom_segment(data = porites_jaccard_genus_df, aes(x = 0, y = 0, xend = PCoA1, yend = PCoA2),
+                 arrow = arrow(length = unit(0.2, "cm")), color = "black") +
+  geom_text_repel(data = porites_jaccard_genus_df, aes(x = PCoA1, y = PCoA2, label = Genus), 
+            size = 6, color = "black", vjust = -0.5)) 
+
+```
+```{r jaccard diversity panel graph R2, fig.height=10, fig.width=20}
+ggarrange(acropora_jaccard_plot_2, 
+          porites_jaccard_plot_2, ncol=2, nrow=1, widths = c(1,1), common.legend = TRUE,
+          legend="bottom", legend.grob = get_legend(acropora_bray_plot)) 
+```
+# New Figure S4 - class level viz
+```{r stacked bar chart, fig.height = 10, fig.width=25}
+
+# extract class data
+acropora_class_table <- tax_glom(acropora_rel_abund, taxrank = "Class")
+
+acropora_class_data <- as.data.frame(t(otu_table(acropora_class_table))) 
+
+acropora_class_names <- as.data.frame(tax_table(acropora_class_table))$Class  # Extract Genus names
+colnames(acropora_class_data) <- acropora_class_names  # Replace otus as columns with Genus names
+acropora_class_data$Algal.trt <- acropora_adiv$Algal.trt
+
+# extract class data
+porites_class_table <- tax_glom(porites_rel_abund, taxrank = "Class")
+
+porites_class_data <- as.data.frame(t(otu_table(porites_class_table))) 
+
+porites_class_names <- as.data.frame(tax_table(porites_class_table))$Class  # Extract Genus names
+colnames(porites_class_data) <- porites_class_names  # Replace otus as columns with Genus names
+
+porites_class_data$Algal.trt <- porites_adiv$Algal.trt
+
+# find classes common across both dataframes
+common_classes <- intersect(colnames(acropora_class_data)[colnames(acropora_class_data) != "Algal.trt"],
+                            colnames(porites_class_data)[colnames(porites_class_data) != "Algal.trt"])
+
+# subset appropriately
+acropora_common <- acropora_class_data %>%
+  dplyr::select(Algal.trt, all_of(common_classes))
+
+porites_common <- porites_class_data %>%
+  dplyr::select(Algal.trt, all_of(common_classes))
+
+combined_data <- base::rbind(acropora_common, porites_common)
+
+# pivot longer for graphing
+long_class_data <- combined_data %>%
+  rownames_to_column(var = "SampleID") %>%  # Optional: keep track of sample IDs
+  pivot_longer(
+    cols = -c(SampleID, Algal.trt),  # All columns except "SampleID" and "Treatment" will be pivoted
+    names_to = "Class",              # Create a "Class" column for microbial classes
+    values_to = "Abundance"          # Relative abundances go into the "Abundance" column
+  )
+
+# extract the top 20 most abundant classes
+top_classes <- long_class_data %>%
+  group_by(Class) %>%
+  summarise(Total_Abundance = sum(Abundance, na.rm = TRUE)) %>%
+  arrange(desc(Total_Abundance)) %>%
+  slice_head(n = 20) %>%  # Select the top 20 classes
+  pull(Class)  # Extract the class names
+
+# coerce uncommon classes into "other"
+long_class_data <- long_class_data %>%
+  mutate(Class = ifelse(Class %in% top_classes, Class, "Other"))
+
+# Add species column
+long_class_data <- long_class_data %>%
+  mutate(Coral = ifelse(grepl("^A", SampleID), "Acropora", "Porites"))  
+
+# make other always come out first
+long_class_data <- long_class_data %>%
+  mutate(Class = ifelse(Class %in% top_classes, Class, "Other")) %>%
+  mutate(Class = factor(Class, levels = c("Other", top_classes)))  # Ensure "Other" is the first level
+
+# For plot colours
+colors <- c(rainbow(20), "grey")  # Assign rainbow colors to top 19 classes, grey to "Other"
+names(colors) <- c(top_classes, "Other")  # Correctly map colors to the classes
+
+acropora_class_data_2 <- subset(long_class_data, Coral == "Acropora")
+porites_class_data_2 <- subset(long_class_data, Coral == "Porites")
+
+acropora_class_data_2$Algal.trt <- as.factor(acropora_class_data_2$Algal.trt)
+facet_treatment_order <- c("Empty", "Macroalgae mimic", "Turf mimic", "Amansia", "Sargassum", "S nigricans","S punctatus")
+
+# Will have to add italics in photoshop - not working here for some reasong
+(acropora_class_plot <-
+  ggplot(acropora_class_data_2, aes(x = SampleID, y = Abundance, fill = Class)) +
+  geom_bar(stat = "identity", position = "stack") +  # Stacked bar plot
+  facet_wrap(~ factor(Algal.trt, levels = facet_treatment_order),
+             labeller = as_labeller(facet_labels),
+             scales = "free_x", nrow = 1, strip.position = "bottom") +  # Facet by species 
+  guides(fill = guide_legend(ncol = 1)) +
+  scale_y_continuous(limits = c(0,1.01), expand = c(0, 0)) + # remove blank space
+  labs(x = "", y = "Relative Abundance\n", fill = "Class",
+        title = "a. A. pulchra") +
+  scale_fill_manual(values = colors) + 
+  theme_classic() +
+  theme(axis.text.x = element_blank(),  
+        axis.ticks.x = element_blank(),
+        axis.title.y = element_text(size = 26),
+        axis.text.y = element_text(size = 22),
+        axis.title.x = element_blank(),
+        plot.title = element_text(size = 28),
+        strip.text = element_text(size = 26),  
+        legend.text = element_text(size=24),
+        legend.title = element_text(size=26),
+        strip.background = element_blank(), 
+        strip.placement = "outside",
+        plot.margin = margin(t = 0, r = 0, b = 0, l = 0, unit = "lines"),
+        legend.position = "right")  )
+
+
+(porites_class_plot <-
+  ggplot(porites_class_data_2, aes(x = SampleID, y = Abundance, fill = Class)) +
+  geom_bar(stat = "identity", position = "stack") +  # Stacked bar plot
+  facet_wrap(~ factor(Algal.trt, levels = facet_treatment_order),
+             labeller = as_labeller(facet_labels),
+             scales = "free_x", nrow = 1, strip.position = "bottom") +  # Facet by species 
+  guides(fill = guide_legend(ncol = 1)) +
+  scale_y_continuous(limits = c(0,1.01), expand = c(0, 0)) + # remove blank space
+  labs(x = "", y = "Relative Abundance\n", fill = "Class",
+        title = "b. P. rus") +
+  scale_fill_manual(values = colors) + 
+  theme_classic() +
+  theme(axis.text.x = element_blank(),  
+        axis.ticks.x = element_blank(),
+        axis.title.y = element_text(size = 26),
+        axis.text.y = element_text(size = 22),
+        axis.title.x = element_blank(),
+        plot.title = element_text(size = 28),
+        strip.text = element_text(size = 26),  
+        legend.text = element_text(size=24),
+        legend.title = element_text(size=26),
+        strip.background = element_blank(), 
+        strip.placement = "outside",
+        plot.margin = margin(t = 0, r = 0, b = 0, l = 0, unit = "lines"),
+        legend.position = "right")  )
+
+        
+         
+```
+
+
+```{r stacked class graph, fig.height = 25, fig.width=25}
+ggarrange(acropora_class_plot, 
+          porites_class_plot, ncol=1, nrow=2, widths = c(1,1), common.legend = TRUE,
+          legend="right", legend.grob = get_legend(acropora_class_plot))
+
 ```
