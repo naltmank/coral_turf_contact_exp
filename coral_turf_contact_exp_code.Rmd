@@ -1295,7 +1295,7 @@ porites_dispr #
 # plot of dispersion test
 plot(porites_dispr, main = "Ordination Centroids and Dispersion Labeled: Aitchison Distance", sub = "")
 boxplot(porites_dispr, main = "", xlab = "") # turf trts generally furthest from centroid
-vegan::permutest(porites_dispr) # F = 0.7, P = 0.7
+vegan::permutest(porites_dispr) # F = 0.8, P = 0.55
 
 
 
