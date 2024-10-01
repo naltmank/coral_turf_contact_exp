@@ -331,7 +331,6 @@ Anova(beta_week2mme)
 # Coral trt (X2 = 6.4, P = 0.01)
 # Int (X2 = 24.3, P = 4.6E-04)
 r.squaredGLMM(beta_week2mme) # 0.86, 0.87
-emmeans(beta_week2mme, ~ Coral.treatment | Algal.treatment, type = "response")
 # within factor pairwise comparisons - differences between how algae affects corals
 emmeans(beta_week2mme, pairwise ~ Coral.treatment | Algal.treatment, adjust = "bonferroni")
 # P rus significantly impacted by both turfs more than A pulchra
@@ -476,7 +475,6 @@ plot(residuals(surface_beta_mme) ~ predict(surface_beta_mme)) # some funnelling 
 summary(surface_beta_mme) # low variance between colonies - awesome (std = 0.07)
 Anova(surface_beta_mme) # Algal.treatment (X2 = 59.1, P = 1.4e-13; Coral.treatment X2 = 8.9, P = .003; Int X2 = 13.1, P = 0.001)
 r.squaredGLMM(surface_beta_mme) # 0.75, 0.82
-
 # within-factor pairwise comparisons - differences between treatments for each coral
 emmeans(surface_beta_mme, pairwise ~ Algal.treatment | Coral.treatment, adjust = "bonferroni", type = "response")
 # Acropora: both turfs sig lower than control
@@ -556,7 +554,6 @@ plot(winter_diag <- simulateResiduals(beta_mme)) # no problems detected in model
 Anova(beta_mme) # Difference in yield between corals (X2 = 8.1, P < 0.004), but not between algal treatments (X2 = 6.1, P = 0.2) or interaction (X2 = 5.6, P = 0.2)
 r.squaredGLMM(beta_mme) # 0.36, 0.57
 summary(beta_mme) # some variance at colony level (std = 0.09)
-
 
 emmeans(beta_mme, pairwise ~ Algal.treatment | Coral.treatment, type = "response") # no sig differences
 letters_winter = c('a', 'a', 'a', 'a', 'a',
