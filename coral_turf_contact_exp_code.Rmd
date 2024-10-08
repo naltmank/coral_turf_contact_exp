@@ -1933,13 +1933,30 @@ top_classes <- long_class_data %>%
   slice_head(n = 20) %>%  # Select the top 20 classes
   pull(Class)  # Extract the class names
 
-# coerce uncommon classes into "other"
-long_class_data <- long_class_data %>%
-  mutate(Class = ifelse(Class %in% top_classes, Class, "Other"))
+# Filter long_class_data to only include top class data
+top_class_data <- long_class_data %>%
+  filter(Class %in% top_classes)
+
+# get the relative abundance for all "other" classes
+other_rel_abun <- 1 - rowSums(combined_data[ , colnames(combined_data) %in% top_classes])
+
+# Coerce into a df the same format as the long_class_data
+other_rel_abun_df <-data.frame(
+  SampleID = names(other_rel_abun),
+  Algal.trt = long_class_data$Algal.trt[match(names(other_rel_abun), long_class_data$SampleID)],  # Match treatment to sample
+  Class = "Other",  # Class is set to "Other"
+  Abundance = other_rel_abun  # The abundance values from the vector
+)
+
+# Recombine to create new long_class_data
+long_class_data <- bind_rows(top_class_data, other_rel_abun_df)
+
 
 # Add species column
 long_class_data <- long_class_data %>%
   mutate(Coral = ifelse(grepl("^A", SampleID), "Acropora", "Porites"))  
+
+
 
 # make other always come out first
 long_class_data <- long_class_data %>%
@@ -1961,7 +1978,7 @@ facet_treatment_order <- c("Empty", "Macroalgae mimic", "Turf mimic", "Amansia",
   ggplot(acropora_class_data_2, aes(x = SampleID, y = Abundance, fill = Class)) +
   geom_bar(stat = "identity", position = "stack") +  # Stacked bar plot
   facet_wrap(~ factor(Algal.trt, levels = facet_treatment_order),
-             labeller = as_labeller(facet_labels),
+  #           labeller = as_labeller(facet_labels),
              scales = "free_x", nrow = 1, strip.position = "bottom") +  # Facet by species 
   guides(fill = guide_legend(ncol = 1)) +
   scale_y_continuous(limits = c(0,1.01), expand = c(0, 0)) + # remove blank space
@@ -1988,7 +2005,7 @@ facet_treatment_order <- c("Empty", "Macroalgae mimic", "Turf mimic", "Amansia",
   ggplot(porites_class_data_2, aes(x = SampleID, y = Abundance, fill = Class)) +
   geom_bar(stat = "identity", position = "stack") +  # Stacked bar plot
   facet_wrap(~ factor(Algal.trt, levels = facet_treatment_order),
-             labeller = as_labeller(facet_labels),
+#             labeller = as_labeller(facet_labels),
              scales = "free_x", nrow = 1, strip.position = "bottom") +  # Facet by species 
   guides(fill = guide_legend(ncol = 1)) +
   scale_y_continuous(limits = c(0,1.01), expand = c(0, 0)) + # remove blank space
@@ -2016,8 +2033,8 @@ facet_treatment_order <- c("Empty", "Macroalgae mimic", "Turf mimic", "Amansia",
 
 
 ```{r stacked class graph, fig.height = 25, fig.width=25}
-ggarrange(acropora_class_plot, 
-          porites_class_plot, ncol=1, nrow=2, widths = c(1,1), common.legend = TRUE,
+ggarrange(acropora_class_plot, NULL, # Null to add space
+          porites_class_plot, ncol=1, nrow=3, widths = c(1,1,1), heights = c(1, 0.1, 1), common.legend = TRUE,
           legend="right", legend.grob = get_legend(acropora_class_plot))
 
 ```
