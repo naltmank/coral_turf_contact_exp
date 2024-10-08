@@ -1002,7 +1002,7 @@ summary(porites_poisson)
 Anova(porites_poisson) # X2 = 796.2  P < 2.2e-16
 plot(residuals(porites_poisson) ~ predict(porites_poisson))
 hist(residuals(porites_poisson)) # looks ok
-porites_poisson_comp = emmeans(porites_poisson, pairwise ~ Algal.trt)
+porites_poisson_comp <- emmeans(porites_poisson, pairwise ~ Algal.trt)
 porites_poisson_letters <- cld(object = porites_poisson_comp,
                       adjust = "Tukey",
                       Letters = letters,
@@ -1549,7 +1549,10 @@ ggarrange(acropora_jaccard_plot,
 
 ## Figure S5 - DeSeq Heatmap
 
-```{r acropora deseq summary matrix}
+```{r acropora deseq summary matrix, fig.height = 10, fig.width= 10}
+treatment_order_heatmap <- c('Empty', 'Macroalgae mimic', 'Turf mimic', 'Amansia',
+                              'Sargassum', 'S nigricans', 'S punctatus')
+
 acropora_deseq_summary <- read.csv(here::here("data", "acropora_deseq_summary_matrix.csv"), row.names = 1)
 acropora_deseq_summary <- as.matrix(acropora_deseq_summary)
 colnames(acropora_deseq_summary) <- rownames(acropora_deseq_summary)
@@ -1563,10 +1566,27 @@ melted_acropora_deseq <- melted_acropora_deseq %>%
 (acropora_heatmap <- ggplot(data = melted_acropora_deseq, aes(Var2, Var1, fill = value))+
  geom_tile(color = "white")+
  geom_text(aes(Var2, Var1, label = value), color = "black", size = 8) +
+      scale_x_discrete(limits = treatment_order_heatmap, 
+                       labels = c("Zip-tie",
+                              "Turf mimic",
+                              "Macroalgal mimic",
+                              expression(italic("Amansia")),
+                              expression(italic("Sargassum")),
+                              expression(italic("S. nigricans")),
+                              expression(italic("S. punctatus")))) +
+          scale_y_discrete(limits = treatment_order_heatmap, 
+                       labels = c("Zip-tie",
+                              "Turf mimic",
+                              "Macroalgal mimic",
+                              expression(italic("Amansia")),
+                              expression(italic("Sargassum")),
+                              expression(italic("S. nigricans")),
+                              expression(italic("S. punctatus")))) +
  scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
    midpoint = 0, limit = c(-30,30), space = "Lab", 
    name="Delta\n(Trt2 - Trt1)") +
   labs(title = "a. *A. pulchra*", x = "Treatment 2", y = "Treatment 1") +
+    
   
   theme_minimal()+ 
 theme(
@@ -1611,7 +1631,22 @@ melted_porites_deseq <- melted_porites_deseq %>%
    midpoint = 0, limit = c(-65,65), space = "Lab", 
    name="Delta\n(Trt2 - Trt1)") +
   labs(title = "b. *P. rus*", x = "Treatment 2", y = "Treatment 1") +
-  
+        scale_x_discrete(limits = treatment_order_heatmap, 
+                       labels = c("Zip-tie",
+                              "Turf mimic",
+                              "Macroalgal mimic",
+                              expression(italic("Amansia")),
+                              expression(italic("Sargassum")),
+                              expression(italic("S. nigricans")),
+                              expression(italic("S. punctatus")))) +
+          scale_y_discrete(limits = treatment_order_heatmap, 
+                       labels = c("Zip-tie",
+                              "Turf mimic",
+                              "Macroalgal mimic",
+                              expression(italic("Amansia")),
+                              expression(italic("Sargassum")),
+                              expression(italic("S. nigricans")),
+                              expression(italic("S. punctatus")))) +
   theme_minimal()+ 
 theme(
   panel.grid.major = element_blank(),
@@ -1637,12 +1672,12 @@ theme(
 
 ```
 ### plot Figure S4 panel graph
-```{r heatmap panel, fig.height = 22, fig.width= 10}
+```{r heatmap panel, fig.height = 22, fig.width= 14}
 
 grid.arrange(arrangeGrob(acropora_heatmap , porites_heatmap, nrow = 2)
              )
 
-ggarrange(acropora_heatmap, porites_heatmap, ncol=1, nrow=2, heights = c(1,1)) 
+ggarrange(acropora_heatmap, porites_heatmap, ncol=1, nrow=2, heights = c(1,1)) # fix legend position in photoshop
 ```
 
 ### Broad summary info from DeSeq for results and discussion
