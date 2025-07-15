@@ -283,8 +283,10 @@ ggplot() +
 
 ## setup and analysis
 ```{r read in data and preliminary viz}
-comb <- read.csv(here::here("data", "coral_algal_contact_data.csv"), stringsAsFactors = T) # read data
-comb$Colony.ID <- as.factor(paste(comb$Coral.treatment, comb$Block)) # add colony ID factor for random effect
+comb <- read.csv(here::here("data", "coral_algal_contact_data_combined.csv"), stringsAsFactors = T) # read data
+
+# subset data from coral-algal contact experiment
+c_exp <- subset(comb, Experiment == "Coral_algal_contact")
 
 
 
@@ -295,7 +297,7 @@ comb$Colony.ID <- as.factor(paste(comb$Coral.treatment, comb$Block)) # add colon
 ## week 1 statistics - not used in final MS
 
 ```{r week 1 stats}
-week1 <- subset(comb, Week == 1) # subset initial week 1 data
+week1 <- subset(c_exp, Week == 1) # subset initial week 1 data
 # Fit beta mixed model
 beta_week1mme <- glmmTMB(Yield ~ Algal.treatment*Coral.treatment + (1|Colony.ID), data = week1, beta_family(link = "logit"))
 
@@ -321,7 +323,7 @@ emmeans(beta_week1mme, pairwise ~ Algal.treatment | Coral.treatment, adjust = "b
 
 ```{r week 2}
 
-week2 <- subset(comb, Week == 2)
+week2 <- subset(c_exp, Week == 2)
 
 beta_week2mme <- glmmTMB(Yield ~ Algal.treatment*Coral.treatment + (1|Colony.ID), data = week2, beta_family(link = "logit"))
 plot(week2_diag <- simulateResiduals(beta_week2mme)) 
@@ -372,7 +374,7 @@ week2_graph$Letters <- contact_letters_2 # add letters
 week2_graph$Labels <- c(rep("a. Acropora pulchra\n", 7), rep("b. Porites rus\n", 7))
 week2_stats <- data.frame(Coral.treatment = c("Acropora pulchra", "Porites rus"), Text = c("", "Algae: P < E-16\nCoral: P = 0.01\nCoral X Algae: P = 4.6E-04")) # create dataframe so text only appears in bottom facet
 
-## VERSION 1
+## Plot
 ggplot(data = week2) +
   geom_boxplot(aes(x = Algal.treatment, y = Yield, colour = Coral.treatment),
                position = position_dodge(0.9), outlier.shape = NA, size = 1.2) +
@@ -415,50 +417,12 @@ ggplot(data = week2) +
   )
 ## TEXT SPACING ON X AXIS EDITED IN PHOTOSHOP
 
-## VERSION 2
-ggplot(data = week2) +
-  geom_boxplot(aes(x = Algal.treatment, y = Yield, colour = Coral.treatment),
-               position = position_dodge(0.9), outlier.shape = NA, size = 1.2) +
-  scale_x_discrete(limits = treatment_order, labels = c('Empty', 'Macroalgae\nmimic', 'Turf\nmimic', 'Amansia',
-                              'Sargassum', 'S nigricans\nturf', 'S punctatus\nturf')) +
-  geom_point(aes(x = Algal.treatment, y = Yield, colour = Coral.treatment),
-              size = 3, position = position_jitterdodge(dodge.width = 0.9, jitter.width = 0.3)) +
-  scale_colour_manual(values=c("Acropora pulchra" = "dodgerblue",
-                               "Porites rus" = "firebrick2") 
-                      ) +
-  geom_text(data = week2_graph, aes(x = Algal.treatment, y = 0.7, colour = Coral.treatment, label = Letters),
-            position = position_dodge(0.9), size = 8) +
- geom_text(data = week2_graph, aes(x = Algal.treatment, y = 0.72,
-                                    label = c("", "", "", "", "", "", "",
-                                              "", "", "", "", "", "**", "***")), # add a star for sig interaction 
-           size = 12) +
-  facet_wrap(~Coral.treatment, ncol = 1, 
-             labeller = as_labeller(c(`Acropora pulchra` = "a. *A. pulchra*\n",
-                                      `Porites rus` = "b. *P. rus*\n"))) +
-  geom_text(data = week2_stats, aes(x = 0.7, y = 0.18, label = Text), hjust = 0, size = 9)+
-  theme_classic() + 
-  theme(panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(),
-        panel.background = element_blank(),
-        legend.position = "bottom",
-        legend.key.size = unit(2, 'cm'),
-        legend.text = element_text(size=20),
-        legend.title = element_text(size=20),
-        axis.line = element_line(colour = "black"),
-        axis.text.x = element_text(color = "grey20", size = 25, hjust = .5, vjust = .5, face = "plain"),
-        axis.title.x = element_text(color = "grey20", size = 28, hjust = .5, vjust = 0, face = "plain"),
-        axis.text.y = element_text(color = "grey20", size = 25, hjust = .5, vjust = .5, face = "plain"),
-        axis.title.y = element_text(color = "grey20", size = 28, hjust = .5, vjust = 0, face = "plain"),
-        strip.text.x = element_text(color = "grey20", size = 28, hjust = 0, vjust = 0, face = "plain"),
-        strip.background = element_blank(),
-        strip.text = element_markdown()
-  )
 
 ```
 # Figure 3 - turf surface chemical extracts
 ## read and analyze data
 ```{r surface extracts march}
-surface <- read.csv(here::here("data", "turf_extract_pam_data_march.csv")) # read data
+surface <- subset(comb, Experiment == "Summer_allelopathy")
 
 
 # with random effect
@@ -537,7 +501,7 @@ ggplot(data = surface) +
 # Figure 4 - seasonal extracts experiment 
 ## read data and model
 ```{r winter surface, fig.height=10, fig.width=10}
-winter <- read.csv(here::here("data", "turf_extract_pam_data_winter.csv"), stringsAsFactors = T)
+winter <- subset(comb, Experiment == "Winter_allelopathy")
 # levels(winter$Algal.treatment)[levels(winter$Algal.treatment)=="Summer S nigricans turf"] <- "March S nigricans turf"
 
 # basic viz
