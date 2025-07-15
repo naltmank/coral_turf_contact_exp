@@ -1,5 +1,5 @@
 # Introduction
-Contains data and code for damselfish turf allelopathy publication in review at Coral Reefs.
+Contains data and code for Altman-Kurosaki et al. 2024 (https://doi.org/10.1007/s00338-024-02585-7).
 
 The data folder contains all data necessary to run the analyses in the code file (coral_turf_contact_exp_code.rmd). 
 
